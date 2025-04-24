@@ -1,4 +1,4 @@
-FROM node:20-slim AS base
+FROM node:20-slim
 
 # PNPM
 ENV PNPM_HOME="/pnpm"
@@ -14,11 +14,14 @@ RUN corepack enable
 WORKDIR /app
 
 # COPY FILES
-COPY . .
+COPY ./package.json /app/package.json
 
 # INSTALL DEPENDENCIES
-RUN pnpm install
+RUN pnpm install -f
 
-EXPOSE 4000
+# COPY FILES
+COPY . .
+
+EXPOSE 3000
 
 CMD ["pnpm", "dev"]

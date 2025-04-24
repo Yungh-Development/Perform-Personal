@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+    --color-main-background-color: #6377FF;
+    --color-categories-card: #2D27FF;
+    --color-sub-categories-card: #5652ff;
+    --color-subtitle: #666666;
+    --color-submit-text: #ffffff;
+}

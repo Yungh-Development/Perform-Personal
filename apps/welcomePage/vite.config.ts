@@ -3,12 +3,14 @@
 import legacy from '@vitejs/plugin-legacy'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    legacy()
+    legacy(),    
+    tailwindcss(),
   ],
   test: {
     globals: true,
@@ -16,9 +18,9 @@ export default defineConfig({
     setupFiles: './src/setupTests.ts',
   },
   server: {
-    port: 6000
+    port: 3001
   },
   preview: {
-    port: 6001
+    port: 3031
   }
 })

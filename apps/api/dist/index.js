@@ -1,5 +1,5 @@
 // @bun
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/utils/body.js
+// ../../node_modules/hono/dist/utils/body.js
 var parseBody = async (request, options = /* @__PURE__ */ Object.create(null)) => {
   const { all = false, dot = false } = options;
   const headers = request instanceof HonoRequest ? request.raw.headers : request.headers;
@@ -63,7 +63,7 @@ var handleParsingNestedValues = (form, key, value) => {
   });
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/utils/url.js
+// ../../node_modules/hono/dist/utils/url.js
 var splitPath = (path) => {
   const paths = path.split("/");
   if (paths[0] === "") {
@@ -258,7 +258,7 @@ var getQueryParams = (url, key) => {
 };
 var decodeURIComponent_ = decodeURIComponent;
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/request.js
+// ../../node_modules/hono/dist/request.js
 var tryDecodeURIComponent = (str) => tryDecode(str, decodeURIComponent_);
 var HonoRequest = class {
   raw;
@@ -366,7 +366,7 @@ var HonoRequest = class {
   }
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/utils/html.js
+// ../../node_modules/hono/dist/utils/html.js
 var HtmlEscapedCallbackPhase = {
   Stringify: 1,
   BeforeStream: 2,
@@ -404,7 +404,7 @@ var resolveCallback = async (str, phase, preserveCallbacks, context, buffer) => 
   }
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/context.js
+// ../../node_modules/hono/dist/context.js
 var TEXT_PLAIN = "text/plain; charset=UTF-8";
 var setHeaders = (headers, map = {}) => {
   for (const key of Object.keys(map)) {
@@ -653,7 +653,7 @@ var Context = class {
   };
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/compose.js
+// ../../node_modules/hono/dist/compose.js
 var compose = (middleware, onError, onNotFound) => {
   return (context, next) => {
     let index = -1;
@@ -702,7 +702,7 @@ var compose = (middleware, onError, onNotFound) => {
   };
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/router.js
+// ../../node_modules/hono/dist/router.js
 var METHOD_NAME_ALL = "ALL";
 var METHOD_NAME_ALL_LOWERCASE = "all";
 var METHODS = ["get", "post", "put", "delete", "options", "patch"];
@@ -710,10 +710,10 @@ var MESSAGE_MATCHER_IS_ALREADY_BUILT = "Can not add a route since the matcher is
 var UnsupportedPathError = class extends Error {
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/utils/constants.js
+// ../../node_modules/hono/dist/utils/constants.js
 var COMPOSED_HANDLER = "__COMPOSED_HANDLER";
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/hono-base.js
+// ../../node_modules/hono/dist/hono-base.js
 var notFoundHandler = (c) => {
   return c.text("404 Not Found", 404);
 };
@@ -927,7 +927,7 @@ var Hono = class {
   };
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/router/reg-exp-router/node.js
+// ../../node_modules/hono/dist/router/reg-exp-router/node.js
 var LABEL_REG_EXP_STR = "[^/]+";
 var ONLY_WILDCARD_REG_EXP_STR = ".*";
 var TAIL_WILDCARD_REG_EXP_STR = "(?:|/.*)";
@@ -1028,7 +1028,7 @@ var Node = class {
   }
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/router/reg-exp-router/trie.js
+// ../../node_modules/hono/dist/router/reg-exp-router/trie.js
 var Trie = class {
   #context = { varIndex: 0 };
   #root = new Node;
@@ -1084,7 +1084,7 @@ var Trie = class {
   }
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/router/reg-exp-router/router.js
+// ../../node_modules/hono/dist/router/reg-exp-router/router.js
 var emptyParam = [];
 var nullMatcher = [/^$/, [], /* @__PURE__ */ Object.create(null)];
 var wildcardRegExpCache = /* @__PURE__ */ Object.create(null);
@@ -1266,7 +1266,7 @@ var RegExpRouter = class {
   }
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/router/smart-router/router.js
+// ../../node_modules/hono/dist/router/smart-router/router.js
 var SmartRouter = class {
   name = "SmartRouter";
   #routers = [];
@@ -1321,7 +1321,7 @@ var SmartRouter = class {
   }
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/router/trie-router/node.js
+// ../../node_modules/hono/dist/router/trie-router/node.js
 var emptyParams = /* @__PURE__ */ Object.create(null);
 var Node2 = class {
   #methods;
@@ -1477,7 +1477,7 @@ var Node2 = class {
   }
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/router/trie-router/router.js
+// ../../node_modules/hono/dist/router/trie-router/router.js
 var TrieRouter = class {
   name = "TrieRouter";
   #node;
@@ -1499,7 +1499,7 @@ var TrieRouter = class {
   }
 };
 
-// ../../node_modules/.pnpm/hono@4.7.1/node_modules/hono/dist/hono.js
+// ../../node_modules/hono/dist/hono.js
 var Hono2 = class extends Hono {
   constructor(options = {}) {
     super(options);
@@ -1510,12 +1510,12 @@ var Hono2 = class extends Hono {
 };
 
 // src/constants.ts
-var DEFAULT_API_PORT = 4000;
+var DEFAULT_API_PORT = 3000;
 
 // src/index.ts
 var app = new Hono2;
 app.get("/", (c) => {
-  return c.text("Hello Hono!");
+  return c.text("Hello Bono!");
 });
 app.get("/test", (c) => {
   return c.json({
