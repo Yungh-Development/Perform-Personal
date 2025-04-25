@@ -41,7 +41,7 @@ const CategoriesCrud: React.FC = () => {
          <div className="absolute inset-0 -z-10 h-full w-full bg-white"></div>
           <img src="./nippon-sorocaba.png" alt="teste" className="w-30 absolute left-5 ion-padding cursor-pointer" />
             <div className="text-main-background-color text-2xl lg:text-3xl flex justify-center items-center mr-4">
-              <ion-icon name="snow" aria-hidden="true"></ion-icon>
+              {/* <ion-icon name="snow" aria-hidden="true"></ion-icon> */}
             </div>
           <h1 className="text-subtitle text-2xl lg:text-3xl">FridgeStockManager</h1>   
         </div>
