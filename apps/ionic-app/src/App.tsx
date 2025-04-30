@@ -10,7 +10,8 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import CategoriesCrud from './pages/catogoriesCrud/page';
+import WelcomePage from './pages/welcomePage/page';
+import HomePage from './pages/homePage/page';
 import './index.css'
 
 
@@ -52,17 +53,12 @@ const App: React.FC = () => (
       <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/">
-            <h1>Monda</h1>
+            <WelcomePage/>
           </Route>
-          <Route exact path="/RegistrationForm">
-            <h1>Presta atenção</h1>
+          <Route exact path="/HomePage">
+            <HomePage />
           </Route>
-          <Route exact path="/CategoriesCrud">
-            <CategoriesCrud />
-          </Route>
-          <Route exact path="/ProductRegister">
-            <h1>Ai ai ai</h1>
-          </Route>
+        
         </IonRouterOutlet>
       </IonTabs>
     </IonReactRouter>

@@ -1,2 +1,76 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+
+
+:root {
+    --ion-color-personal-color: #FF9500;
+    --ion-color-personal-color-rgb: 255, 149, 0;
+    --ion-color-personal-color-contrast: #000000;
+    --ion-color-personal-color-contrast-rgb: 0, 0, 0;
+    --ion-color-personal-color-shade: #e08300;
+    --ion-color-personal-color-tint: #ffa01a;
+
+    --ion-color-black: #000000;
+    --ion-color-black-rgb: 0, 0, 0;
+    --ion-color-black-contrast: #ffffff;
+    --ion-color-black-contrast-rgb: 255, 255, 255;
+    --ion-color-black-shade: #000000;
+    --ion-color-black-tint: #1a1a1a;
+
+    --ion-color-yellow-personal: #FFCC00;
+    --ion-color-yellow-personal-rgb: 255, 204, 0;
+    --ion-color-yellow-personal-contrast: #000000;
+    --ion-color-yellow-personal-contrast-rgb: 0, 0, 0;
+    --ion-color-yellow-personal-shade: #e0b400;
+    --ion-color-yellow-personal-tint: #ffd11a;
+
+    --ion-color-page-background: #101014;
+    --ion-color-page-background-rgb: 16, 16, 20;
+    --ion-color-page-background-contrast: #ffffff;
+    --ion-color-page-background-contrast-rgb: 255, 255, 255;
+    --ion-color-page-background-shade: #0e0e12;
+    --ion-color-page-background-tint: #28282c;
+}
+
+.ion-color-black {
+    --ion-color-base: var(--ion-color-black);
+    --ion-color-base-rgb: var(--ion-color-black-rgb);
+    --ion-color-contrast: var(--ion-color-black-contrast);
+    --ion-color-contrast-rgb: var(--ion-color-black-contrast-rgb);
+    --ion-color-shade: var(--ion-color-black-shade);
+    --ion-color-tint: var(--ion-color-black-tint);
+}
+
+.ion-color-yellow-personal {
+    --ion-color-base: var(--ion-color-yellow-personal);
+    --ion-color-base-rgb: var(--ion-color-yellow-personal-rgb);
+    --ion-color-contrast: var(--ion-color-yellow-personal-contrast);
+    --ion-color-contrast-rgb: var(--ion-color-yellow-personal-contrast-rgb);
+    --ion-color-shade: var(--ion-color-yellow-personal-shade);
+    --ion-color-tint: var(--ion-color-yellow-personal-tint);
+}
+
+.ion-color-page-background {
+    --ion-color-base: var(--ion-color-page-background);
+    --ion-color-base-rgb: var(--ion-color-page-background-rgb);
+    --ion-color-contrast: var(--ion-color-page-background-contrast);
+    --ion-color-contrast-rgb: var(--ion-color-page-background-contrast-rgb);
+    --ion-color-shade: var(--ion-color-page-background-shade);
+    --ion-color-tint: var(--ion-color-page-background-tint);
+}
+
+ion-icon {
+    font-size: 18px;
+}
+
+ion-footer ion-icon {
+    color: #5f5f5f;
+}
+
+ion-footer ion-icon:hover {
+    color: #FE9A00;
+}
+
+.ion-footer-icons {
+    font-size: 38px;
+}
