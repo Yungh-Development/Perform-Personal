@@ -11,6 +11,9 @@ importers:
       '@ionic/cli':
         specifier: ^7.2.0
         version: 7.2.0
+      ionicons:
+        specifier: ^7.4.0
+        version: 7.4.0
 
   apps/ionic-app:
     dependencies:

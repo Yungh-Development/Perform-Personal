@@ -1,40 +1,38 @@
-import React from 'react';
-import { IonButton, IonContent, IonFooter, IonHeader, IonIcon, IonItem, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonContent, IonHeader, IonPage,IonFooter, IonTitle, IonToolbar, IonInput, IonItem, IonLabel, IonButton, IonList } from '@ionic/react';
+import React, { useState } from 'react';
 
+const StudentList: React.FC = () => {
+  const [nome, setNome] = useState('');
+  const [sobrenome, setSobrenome] = useState('');
+  const [idade, setIdade] = useState('');
 
-const HomePage = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log({ nome, sobrenome, idade });
+    setNome('');
+    setSobrenome('');
+    setIdade('');
+  };
+
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
-          <div className="flex w-full ion-padding">
-            <IonButton color="yellow-personal" shape="round">
-              <a href='/' className="flex justify-center items-center">
-                <ion-icon name="arrow-back" slot="icon-only" color="black"></ion-icon>      
-              </a>   
-            </IonButton>
-            <div className="flex justify-center items-center">
-              <IonTitle className="text-white ml-10">Homepage</IonTitle>
+        <IonToolbar className="bg-blue-600">
+            <div className="flex w-full ion-padding">
+              <IonButton color="yellow-personal" shape="round">
+                  <a href='/' className="flex justify-center items-center">
+                      <ion-icon name="arrow-back" slot="icon-only" color="black"></ion-icon>      
+                  </a>   
+              </IonButton>
+              <div className="flex justify-center items-center">
+                  <IonTitle className="text-white ml-10">Formulario de Registro de Aluno</IonTitle>
+              </div>
             </div>
-          </div>         
         </IonToolbar>
       </IonHeader>
-
-      <IonContent color="page-background" className="ion-padding">
-        <IonTitle>ULTIMOS ALUNOS</IonTitle>
-        <IonList>
-          <IonItem>
-            VAI PARA ALUNO 1
-          </IonItem>
-          <IonItem>
-            VAI PARA ALUNO 2
-          </IonItem>
-          <IonItem>
-            VAI PARA ALUNO 3
-          </IonItem>
-        </IonList>
+      <IonContent className="ion-padding" color="page-background">
+  
       </IonContent>
-
       <IonFooter className="relative">
         <div className="absolute bg-amber-500 rounded-full w-14 h-14 flex items-center justify-center left-1/2 -ml-7 -top-1/2">
           <div className="flex">
@@ -69,4 +67,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default StudentList;
