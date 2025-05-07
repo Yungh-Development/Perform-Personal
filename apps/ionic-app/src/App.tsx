@@ -12,6 +12,7 @@ import {
 import { IonReactRouter } from '@ionic/react-router';
 import WelcomePage from './pages/welcomePage/page';
 import HomePage from './pages/homePage/page';
+import StudentForm from './pages/studentForm/page';
 import './index.css'
 
 
@@ -57,6 +58,9 @@ const App: React.FC = () => (
           </Route>
           <Route exact path="/HomePage">
             <HomePage />
+          </Route>
+          <Route exact path="/AdicionaAluno">
+            <StudentForm />
           </Route>
         
         </IonRouterOutlet>

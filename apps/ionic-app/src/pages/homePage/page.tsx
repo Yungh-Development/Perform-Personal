@@ -38,7 +38,7 @@ const HomePage = () => {
       <IonFooter className="relative">
         <div className="absolute bg-amber-500 rounded-full w-14 h-14 flex items-center justify-center left-1/2 -ml-7 -top-1/2">
           <div className="flex">
-          <a href="AdicionaAluno" className="mt-2">
+          <a href="/AdicionaAluno" className="mt-2">
             <ion-icon name="add" color="black" size="large"></ion-icon>
           </a>
           </div>

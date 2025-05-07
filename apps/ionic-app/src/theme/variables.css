@@ -3,12 +3,12 @@ http://ionicframework.com/docs/theming/ */
 
 
 :root {
-    --ion-color-personal-color: #FF9500;
-    --ion-color-personal-color-rgb: 255, 149, 0;
-    --ion-color-personal-color-contrast: #000000;
-    --ion-color-personal-color-contrast-rgb: 0, 0, 0;
-    --ion-color-personal-color-shade: #e08300;
-    --ion-color-personal-color-tint: #ffa01a;
+	--ion-color-orange-personal: #FF9500;
+	--ion-color-orange-personal-rgb: 255,149,0;
+	--ion-color-orange-personal-contrast: #000000;
+	--ion-color-orange-personal-contrast-rgb: 0,0,0;
+	--ion-color-orange-personal-shade: #e08300;
+	--ion-color-orange-personal-tint: #ffa01a;
 
     --ion-color-black: #000000;
     --ion-color-black-rgb: 0, 0, 0;
@@ -30,6 +30,15 @@ http://ionicframework.com/docs/theming/ */
     --ion-color-page-background-contrast-rgb: 255, 255, 255;
     --ion-color-page-background-shade: #0e0e12;
     --ion-color-page-background-tint: #28282c;
+}
+
+.ion-color-orange-personal {
+	--ion-color-base: var(--ion-color-orange-personal);
+	--ion-color-base-rgb: var(--ion-color-orange-personal-rgb);
+	--ion-color-contrast: var(--ion-color-orange-personal-contrast);
+	--ion-color-contrast-rgb: var(--ion-color-orange-personal-contrast-rgb);
+	--ion-color-shade: var(--ion-color-orange-personal-shade);
+	--ion-color-tint: var(--ion-color-orange-personal-tint);
 }
 
 .ion-color-black {
