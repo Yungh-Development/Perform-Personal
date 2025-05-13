@@ -1,30 +1,115 @@
-import { IonContent, IonHeader, IonPage,IonFooter, IonTitle, IonToolbar, IonInput, IonItem, IonLabel, IonButton, useIonRouter , IonRange } from '@ionic/react';
+import { IonContent, IonHeader, IonPage,IonFooter, IonTitle, IonToolbar, IonInput, IonItem, IonLabel, IonButton, useIonRouter , IonRange, IonToast, IonSelect, IonSelectOption } from '@ionic/react';
 import React, { useState } from 'react';
 
-const StudentForm: React.FC = () => {
+interface StudeentData {
+  id: string;
+  nome: string;
+  sobrenome:string;
+  intensidade: string;
+  observacao: string;
+  performance: string;
+  justificativa: string;
+  dataCadastro: string;
+}
+
+interface StudentsForm {
+  id: string;
+  nome: string;
+  sobrenome: string;
+}
+
+const PerformanceForm: React.FC = () => {
   const [nome, setNome] = useState('');
+  const [sobrenome, setSobreNome] = useState('');
   const [intensidade, setIntensidade] = useState('');
   const [observacao, setObservacao] = useState('');
   const [performance, setPerformance] = useState('');
   const [justificativa, setJustificativa] = useState('');
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMensagem, setToastMensagem] = useState('');
 
   const router = useIonRouter();
+
+  const loadStudents = (): StudentsForm[] => {
+  const savedStudents = localStorage.getItem('studentsForm');
+  return savedStudents ? JSON.parse(savedStudents) : [];
+};
 
   const handleIconClick = (iconName: string) => {
     setPerformance(iconName);
   };
 
+  const saveLocalStorage = (studentData: StudeentData) =>{
+    try {
+      const existingData = localStorage.getItem('studentsData');
+      let studentsArray: StudeentData[] = [];
+
+      if(existingData) {
+        studentsArray = JSON.parse(existingData);
+      }
+
+      studentsArray.push(studentData);
+      localStorage.setItem('studentsData', JSON.stringify(studentsArray));
+
+      return true;
+
+    } catch (error) {
+      console.error("Error saving data on localStorage", error);
+      return false;
+    }
+  }
+
+  const generateLocalFile = (studentData: StudeentData) => {
+    const dataStr = JSON.stringify(studentData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = `aluno_${studentData.nome}_${studentData.id}.json`;
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ nome, intensidade, observacao, performance, justificativa });
-    setNome('');
-    setIntensidade('');
-    setPerformance('');
-    setSelectedIcon(null);
-    setJustificativa('');
+    console.log({ nome, sobrenome, intensidade, observacao, performance, justificativa });
 
-    router.push('/HomePage', 'back', 'push');
+    const studentData: StudeentData = {
+      id: Date.now().toString(),
+      nome,
+      sobrenome,
+      intensidade,
+      observacao,
+      performance,
+      justificativa,
+      dataCadastro: new Date().toISOString()
+    };
+
+    const saveSucess = saveLocalStorage(studentData);
+
+    if(saveSucess) {
+      generateLocalFile(studentData);
+
+      setToastMensagem("Aluno Cadastrado!");
+      setShowToast(true);
+      setNome('');
+      setSobreNome('');
+      setIntensidade('');
+      setPerformance('');
+      setSelectedIcon(null);
+      setJustificativa('');
+      setObservacao('');
+
+      setTimeout(() => {
+        router.push('./home', 'back', 'push');
+      }, 3000);
+    } else {
+      setToastMensagem("Erro ao Salvar dados");
+      setShowToast(true);
+    }
   };
 
   console.log(intensidade)
@@ -33,10 +118,8 @@ const StudentForm: React.FC = () => {
       <IonHeader>
         <IonToolbar className="bg-blue-600">
             <div className="flex w-full ion-padding">
-                <IonButton color="yellow-personal" shape="round">
-                    <a href='/HomePage' className="flex justify-center items-center">
-                        <ion-icon name="arrow-back" slot="icon-only" color="black"></ion-icon>      
-                    </a>   
+                <IonButton color="yellow-personal" shape="round" onClick={()=> router.push("/home")}>
+                  <ion-icon name="arrow-back" slot="icon-only" color="black"></ion-icon>                         
                 </IonButton>
                 <div className="flex justify-center items-center">
                     <IonTitle className="text-white ml-10">Novo Relatório</IonTitle>
@@ -50,13 +133,24 @@ const StudentForm: React.FC = () => {
           <form onSubmit={handleSubmit} className="h-full w-full">
             <div className="py-3 w-full">
               <IonItem className="mb-4 mt-1" color="page-container">
-                <IonInput
-                  type="text"
-                  placeholder="Nome do Aluno"
-                  onIonChange={(e) => setNome(e.detail.value!)}
-                  required
-                />
-              </IonItem>
+                <IonSelect
+                  placeholder="Selecione o aluno"
+                  interface="action-sheet"
+                  onIonChange={(e) => {
+                    const selectedStudent = loadStudents().find(s => `${s.nome} ${s.sobrenome}` === e.detail.value);
+                    if (selectedStudent) {
+                      setNome(selectedStudent.nome);
+                      setSobreNome(selectedStudent.sobrenome)
+                    }
+                  }}
+                >
+                  {loadStudents().map((student) => (
+                    <IonSelectOption key={student.id} value={`${student.nome} ${student.sobrenome}`}>
+                      {student.nome} {student.sobrenome}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>  
               <IonLabel className="mt-4 w-full">Intensidade do Treino</IonLabel>
               <IonItem className="mb-4 mt-1 p-0 w-full" color="page-container">
                 <IonRange 
@@ -138,8 +232,15 @@ const StudentForm: React.FC = () => {
           </form>
         </div>
       </IonContent>
+      <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={toastMensagem}
+          duration={2000}
+          position="top"
+      /> 
     </IonPage>
   );
 };
 
-export default StudentForm;
+export default PerformanceForm;
