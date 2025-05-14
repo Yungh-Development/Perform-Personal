@@ -1,18 +1,16 @@
 import { Redirect, Route } from 'react-router-dom';
 import {
   IonApp,
-  IonIcon,
-  IonLabel,
   IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
   IonTabs,
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import WelcomePage from './pages/welcomePage/page';
-import HomePage from './pages/homePage/page';
-import StudentForm from './pages/studentForm/page';
+import WelcomePage from './pages/welcome/page';
+import HomePage from './pages/home/page';
+import PerformanceForm from './pages/students/form/performance/page';
+import StudentList from './pages/students/list/page';
+import StudentAddForm from './pages/students/form/add/page';
 import './index.css'
 
 
@@ -56,11 +54,17 @@ const App: React.FC = () => (
           <Route exact path="/">
             <WelcomePage/>
           </Route>
-          <Route exact path="/HomePage">
+          <Route exact path="/home">
             <HomePage />
           </Route>
-          <Route exact path="/AdicionaAluno">
-            <StudentForm />
+          <Route exact path="/formulario-performance">
+            <PerformanceForm />
+          </Route>          
+          <Route exact path="/formulario-aluno">            
+            <StudentAddForm/>
+          </Route>
+          <Route exact path="/lista-alunos">
+            <StudentList />
           </Route>
         
         </IonRouterOutlet>

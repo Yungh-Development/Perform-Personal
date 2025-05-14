@@ -19,26 +19,13 @@ const HomePage = () => {
           </div>         
         </IonToolbar>
       </IonHeader>
-
       <IonContent color="page-background" className="ion-padding">
-        <IonTitle>ULTIMOS ALUNOS</IonTitle>
-        <IonList>
-          <IonItem>
-            VAI PARA ALUNO 1
-          </IonItem>
-          <IonItem>
-            VAI PARA ALUNO 2
-          </IonItem>
-          <IonItem>
-            VAI PARA ALUNO 3
-          </IonItem>
-        </IonList>
+ 
       </IonContent>
-
       <IonFooter className="relative">
         <div className="absolute bg-amber-500 rounded-full w-14 h-14 flex items-center justify-center left-1/2 -ml-7 -top-1/2">
           <div className="flex">
-          <a href="/AdicionaAluno" className="mt-2">
+          <a href="/formulario-performance" className="mt-2">
             <ion-icon name="add" color="black" size="large"></ion-icon>
           </a>
           </div>
@@ -46,19 +33,19 @@ const HomePage = () => {
         <div className="flex items-center py-4">
           <div className="flex justify-around w-full">
           <IonButton fill="clear">
-            <a href="/HomePage">
+            <a href="/home">
               <ion-icon name="grid" size="large"></ion-icon>
             </a>
           </IonButton>       
           <IonButton fill="clear">
-            <a href="/Relatorio">
+            <a href="/relatorio">
               <ion-icon name="pie" size="large"></ion-icon>
             </a>
           </IonButton>
           </div>
           <div className="w-full flex justify-center">      
           <IonButton fill="clear">
-            <a href="/Alunos">
+            <a href="/lista-alunos">
               <ion-icon name="people" size="large"></ion-icon>
             </a>
           </IonButton>  
