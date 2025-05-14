@@ -1,10 +1,13 @@
-import { IonContent, IonHeader, IonPage,IonFooter, IonTitle, IonToolbar, IonInput, IonItem, IonLabel, IonButton, useIonRouter , IonRange, IonToast, IonSelect, IonSelectOption } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonFooter, IonTitle, IonToolbar, IonInput, IonItem, IonLabel, IonButton, useIonRouter, IonRange, IonToast } from '@ionic/react';
 import React, { useState } from 'react';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import "./style.css"
 
-interface StudeentData {
+interface StudentData {
   id: string;
   nome: string;
-  sobrenome:string;
+  sobrenome: string;
   intensidade: string;
   observacao: string;
   performance: string;
@@ -12,15 +15,15 @@ interface StudeentData {
   dataCadastro: string;
 }
 
-interface StudentsForm {
-  id: string;
+interface StudentOptionType {
+  inputValue?: string;
   nome: string;
   sobrenome: string;
+  id?: string;
 }
 
 const PerformanceForm: React.FC = () => {
-  const [nome, setNome] = useState('');
-  const [sobrenome, setSobreNome] = useState('');
+  const [selectedStudent, setSelectedStudent] = useState<StudentOptionType | null>(null);
   const [intensidade, setIntensidade] = useState('');
   const [observacao, setObservacao] = useState('');
   const [performance, setPerformance] = useState('');
@@ -31,19 +34,29 @@ const PerformanceForm: React.FC = () => {
 
   const router = useIonRouter();
 
-  const loadStudents = (): StudentsForm[] => {
-  const savedStudents = localStorage.getItem('studentsForm');
-  return savedStudents ? JSON.parse(savedStudents) : [];
-};
+  const loadStudents = (): StudentOptionType[] => {
+    const savedStudents = localStorage.getItem('studentsForm');
+    if (savedStudents) {
+      return JSON.parse(savedStudents).map((student: any) => ({
+        nome: student.nome,
+        sobrenome: student.sobrenome,
+        id: student.id
+      }));
+    }
+    return [];
+  };
+
+  const filter = createFilterOptions<StudentOptionType>();
 
   const handleIconClick = (iconName: string) => {
     setPerformance(iconName);
+    setSelectedIcon(iconName);
   };
 
-  const saveLocalStorage = (studentData: StudeentData) =>{
+  const saveLocalStorage = (studentData: StudentData) => {
     try {
       const existingData = localStorage.getItem('studentsData');
-      let studentsArray: StudeentData[] = [];
+      let studentsArray: StudentData[] = [];
 
       if(existingData) {
         studentsArray = JSON.parse(existingData);
@@ -53,14 +66,13 @@ const PerformanceForm: React.FC = () => {
       localStorage.setItem('studentsData', JSON.stringify(studentsArray));
 
       return true;
-
     } catch (error) {
       console.error("Error saving data on localStorage", error);
       return false;
     }
   }
 
-  const generateLocalFile = (studentData: StudeentData) => {
+  const generateLocalFile = (studentData: StudentData) => {
     const dataStr = JSON.stringify(studentData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
 
@@ -70,17 +82,21 @@ const PerformanceForm: React.FC = () => {
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
-
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ nome, sobrenome, intensidade, observacao, performance, justificativa });
+    
+    if (!selectedStudent) {
+      setToastMensagem("Selecione um aluno primeiro");
+      setShowToast(true);
+      return;
+    }
 
-    const studentData: StudeentData = {
+    const studentData: StudentData = {
       id: Date.now().toString(),
-      nome,
-      sobrenome,
+      nome: selectedStudent.nome,
+      sobrenome: selectedStudent.sobrenome,
       intensidade,
       observacao,
       performance,
@@ -95,8 +111,7 @@ const PerformanceForm: React.FC = () => {
 
       setToastMensagem("Aluno Cadastrado!");
       setShowToast(true);
-      setNome('');
-      setSobreNome('');
+      setSelectedStudent(null);
       setIntensidade('');
       setPerformance('');
       setSelectedIcon(null);
@@ -112,7 +127,6 @@ const PerformanceForm: React.FC = () => {
     }
   };
 
-  console.log(intensidade)
   return (
     <IonPage>
       <IonHeader>
@@ -133,24 +147,113 @@ const PerformanceForm: React.FC = () => {
           <form onSubmit={handleSubmit} className="h-full w-full">
             <div className="py-3 w-full">
               <IonItem className="mb-4 mt-1" color="page-container">
-                <IonSelect
-                  placeholder="Selecione o aluno"
-                  interface="action-sheet"
-                  onIonChange={(e) => {
-                    const selectedStudent = loadStudents().find(s => `${s.nome} ${s.sobrenome}` === e.detail.value);
-                    if (selectedStudent) {
-                      setNome(selectedStudent.nome);
-                      setSobreNome(selectedStudent.sobrenome)
-                    }
-                  }}
-                >
-                  {loadStudents().map((student) => (
-                    <IonSelectOption key={student.id} value={`${student.nome} ${student.sobrenome}`}>
-                      {student.nome} {student.sobrenome}
-                    </IonSelectOption>
-                  ))}
-                </IonSelect>
-              </IonItem>  
+                <div className="w-full">
+                  <Autocomplete
+                    value={selectedStudent}
+                    onChange={(event, newValue) => {
+                      if (typeof newValue === 'string') {
+                        setSelectedStudent({
+                          nome: newValue,
+                          sobrenome: ''
+                        });
+                      } else if (newValue && newValue.inputValue) {
+                        setSelectedStudent({
+                          nome: newValue.inputValue,
+                          sobrenome: ''
+                        });
+                      } else {
+                        setSelectedStudent(newValue);
+                      }
+                    }}
+                    sx={{
+                      '& .MuiAutocomplete-inputRoot': {
+                        color: 'white', 
+                        backgroundColor: '#333',
+                        borderRadius: '4px',
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#666',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#888', 
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#aaa', 
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#ccc', 
+                      },
+                      '& .MuiInputLabel-root.Mui-focused': {
+                        color: '#fff',
+                      },
+                    }}
+                    filterOptions={(options, params) => {
+                      const filtered = filter(options, params);
+                      const { inputValue } = params;
+                      const isExisting = options.some(
+                        (option) => inputValue === `${option.nome} ${option.sobrenome}`
+                      );
+                      
+                      if (inputValue !== '' && !isExisting) {
+                        filtered.push({
+                          inputValue,
+                          nome: `Adicionar "${inputValue}"`,
+                          sobrenome: ''
+                        });
+                      }
+
+                      return filtered;
+                    }}
+                    selectOnFocus
+                    clearOnBlur
+                    handleHomeEndKeys
+                    id="aluno-autocomplete"
+                    options={loadStudents()}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'string') return option;
+                      if (option.inputValue) return option.inputValue;
+                      return `${option.nome} ${option.sobrenome}`;
+                    }}
+                    renderOption={(props, option) => (
+                      <li {...props} style={{ backgroundColor: '#333', color: 'white' }}>
+                        {option.inputValue ? option.nome : `${option.nome} ${option.sobrenome}`}
+                      </li>
+                    )}
+                    freeSolo
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Selecione ou digite o nome do aluno"
+                        variant="outlined"
+                        sx={{
+                          '& .MuiSvgIcon-root': {
+                            color: 'white',
+                          },
+                        }}
+                      />
+                    )}
+                    fullWidth
+                    componentsProps={{
+                      popper: {
+                        sx: {
+                          '& .MuiAutocomplete-listbox': {
+                            backgroundColor: '#333',
+                            color: 'white',
+                            '& li': {
+                              '&:hover': {
+                                backgroundColor: '#444',
+                              },
+                              '&[aria-selected="true"]': {
+                                backgroundColor: '#555',
+                              },
+                            },
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </div>
+              </IonItem>              
               <IonLabel className="mt-4 w-full">Intensidade do Treino</IonLabel>
               <IonItem className="mb-4 mt-1 p-0 w-full" color="page-container">
                 <IonRange 
@@ -161,7 +264,7 @@ const PerformanceForm: React.FC = () => {
                   onIonChange={(e:any) => setIntensidade(e.detail.value!)}
                   min={0} 
                   max={10}
-                  />
+                />
               </IonItem>
               <IonItem className="mb-4 mt-1" color="page-container">
                 <IonInput

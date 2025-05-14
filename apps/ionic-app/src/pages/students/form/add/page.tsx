@@ -52,8 +52,7 @@ const StudentAddForm: React.FC = () => {
             </div>
           </div>
         </IonToolbar>
-      </IonHeader>
-      
+      </IonHeader>      
       <IonContent className="ion-padding">
         <div className="max-w-md mx-auto">
           <h2 className="text-xl font-bold mb-6 text-white">Cadastrar Aluno</h2>
@@ -67,8 +66,7 @@ const StudentAddForm: React.FC = () => {
                 onIonChange={(e) => setNome(e.detail.value!)}
                 required
               />
-            </IonItem>
-            
+            </IonItem>            
             <IonItem className="mb-4" color="page-container">
               <IonInput
                 type="text"
@@ -77,8 +75,7 @@ const StudentAddForm: React.FC = () => {
                 onIonChange={(e) => setSobrenome(e.detail.value!)}
                 required
               />
-            </IonItem>
-            
+            </IonItem>            
             <IonButton 
               expand="block"
               fill="clear"
@@ -90,8 +87,7 @@ const StudentAddForm: React.FC = () => {
             </IonButton>
           </div>
         </div>
-      </IonContent>
-      
+      </IonContent>      
       <IonToast
         isOpen={showToast}
         onDidDismiss={() => setShowToast(false)}
