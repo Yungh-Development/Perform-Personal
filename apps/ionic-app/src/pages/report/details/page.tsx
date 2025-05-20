@@ -44,62 +44,46 @@ const StudentDetails: React.FC = () => {
     <IonPage>
       <HeaderTemplate titlePage={student.nome} urlTemplate="/relatorio" />
       <IonContent className="ion-padding-bottom">
-        <div className="pb-20 w-full">      
-            <h2 className="text-lg font-semibold p-2">Últimos 5 treinos</h2>
-                <div className="flex overflow-x-auto p-2 gap-2 bg-black ion-padding">
-            {records.map((record, index) => (
-                <div key={index} className="min-w-[80px] p-2 rounded text-center">
-                {new Date(record.dataCadastro).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
-              </div>
-            ))}
-            </div>
-                <h2 className="text-lg font-semibold p-2 mt-4">Performancias</h2>
-                <div className="grid gap-4 p-2">
-                {records.map((record, index) => (
-                    <div key={index}>
-                        <div className="flex justify-between items-center mb-1">
-                            <span>
-                            {new Date(record.dataCadastro).toLocaleDateString('pt-BR', { 
-                                day: '2-digit', 
-                                month: 'short' 
-                            })}
-                            </span>
-                        </div>                        
-                        <PerformanceChart 
-                            data={records.map(record => ({
-                                intensidade: record.intensidade
-                            }))} 
-                        />                       
+        <div className="pb-20 w-full">
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold p-2">{`Últimos ${records.slice(-5).length} Treinos`}</h2>
+            <PerformanceChart 
+            data={records.slice(-5).map(record => ({ 
+                intensidade: record.intensidade,
+                dataCadastro: record.dataCadastro 
+            }))} 
+            />
+          </div>
+          <h2 className="text-lg font-semibold p-2 mt-4 ion-padding">Relatórios</h2>
+          <IonList>
+            {records.map((record, index) => {
+              const performanceIcon = svgIcons[record.performance as keyof typeof svgIcons];
+              return (
+                <IonItem key={`report-${index}`} className="ion-padding" onClick={() => history.push(`/student-details/${student.id}`)}>
+                  <div className="w-full">
+                    <div className="w-full flex justify-between items-center">
+                      <IonLabel>
+                        <span className="text-lg">{record.intensidade}</span>
+                      </IonLabel>
+                      <IonLabel>                            
+                        <div>
+                          {performanceIcon.icon}
+                        </div>                         
+                      </IonLabel>
+                      <IonLabel>
+                        <h2 className="font-bold">{student.nome}</h2>                     
+                      </IonLabel>
+                      <IonLabel>
+                        <p className="flex float-end font-bold">
+                          {new Date(record.dataCadastro).toLocaleDateString()}
+                        </p>
+                      </IonLabel>      
                     </div>
-                ))}
-            </div>
-            <h2 className="text-lg font-semibold p-2 mt-4 ion-padding">Relatórios</h2>
-            <IonList>
-                {records.map((record, index) => {
-                    const performanceIcon = svgIcons[record.performance as keyof typeof svgIcons];
-                    return(
-                    <IonItem key={student.id} className="ion-padding" onClick={() => history.push(`/student-details/${student.id}`)}>
-                    <div className="w-full">
-                        <div className="w-full flex justify-between items-center">
-                            <IonLabel>
-                                <h2>{student.intensidade}</h2>
-                            </IonLabel>
-                            <IonLabel>                            
-                                <div>
-                                    {performanceIcon.icon}
-                                </div>                         
-                            </IonLabel>
-                            <IonLabel>
-                                <h2 className="font-bold">{student.nome}</h2>                     
-                            </IonLabel>
-                            <IonLabel>
-                                <p className="flex float-end font-bold">{new Date(record.dataCadastro).toLocaleDateString()}</p>
-                            </IonLabel>      
-                        </div>
-                    </div>
-                    </IonItem> 
-                )})}              
-            </IonList>
+                  </div>
+                </IonItem>
+              );
+            })}              
+          </IonList>
         </div>
       </IonContent>
       <FooterTemplate />

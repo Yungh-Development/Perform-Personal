@@ -1,35 +1,30 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
 interface PerformanceChartProps {
-  data: {
+  data: { 
     intensidade: number;
+    dataCadastro: string; 
   }[];
 }
 
 const PerformanceChart: React.FC<PerformanceChartProps> = ({ data }) => {
-  const lastFiveRecords = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    return data.slice(-5);
-  }, [data]);
-
-  if (lastFiveRecords.length === 0) {
+  if (data.length === 0) {
     return (
-      <div className="text-center p-5 text-gray-500 bg-gray-50 rounded-lg">
+      <div className="text-center p-5 text-white bg-gray-50 rounded-lg">
         Nenhum dado de desempenho disponível
       </div>
     );
   }
 
   return (
-    <div className="my-5 p-4 bg-white rounded-lg shadow-sm">
-      <h3 className="text-center mb-5 text-gray-700 text-lg font-medium">
-        Desempenho Recente (Últimos 5 registros)
-      </h3>
-      
+    <div className="my-5 p-4 bg-stone-800 rounded-lg shadow-sm">
+      <h3 className="pb-20 text-white text-lg font-medium">
+        Performance
+      </h3>      
       <div className="flex justify-around items-end h-48 gap-2">
-        {lastFiveRecords.map((item, index) => {
+        {data.map((item, index) => {
           const intensidade = Math.min(Math.max(item.intensidade, 0), 10);
-          const heightPercentage = intensidade * 10;
+          const porcentagem = intensidade * 10;
           
           let barColor = '';
           if (intensidade <= 2) barColor = 'bg-red-500';
@@ -38,15 +33,19 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({ data }) => {
           else barColor = 'bg-green-500';
 
           return (
-            <div key={`intensidade-${index}`} className="flex flex-col items-center flex-1 max-w-[60px]">
+            <div key={`chart-${index}`} className="flex flex-col items-center flex-1 max-w-[60px]">
               <div className="h-44 w-10 flex items-end bg-gray-100 rounded-t-md overflow-hidden">
                 <div 
                   className={`w-full ${barColor} transition-all duration-300 rounded-t-md`}
-                  style={{ height: `${heightPercentage}%` }}
+                  style={{ height: `${porcentagem}%` }}
                 />
               </div>
-              <div className="mt-1 text-sm font-bold text-gray-700">
-                {intensidade}
+              <div className="mt-1 text-xs text-white text-center">
+                {new Date(item.dataCadastro).toLocaleDateString('pt-BR', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric'
+                })}
               </div>
             </div>
           );
