@@ -1,4 +1,5 @@
 import React from 'react';
+import { getBackgroundColorByIntensity } from '../../../../utils/getColor';
 
 interface PerformanceChartProps {
   data: { 
@@ -26,11 +27,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({ data }) => {
           const intensidade = Math.min(Math.max(item.intensidade, 0), 10);
           const porcentagem = intensidade * 10;
           
-          let barColor = '';
-          if (intensidade <= 2) barColor = 'bg-red-500';
-          else if (intensidade <= 5) barColor = 'bg-orange-400';
-          else if (intensidade <= 8) barColor = 'bg-yellow-400';
-          else barColor = 'bg-green-500';
+          const barColor = getBackgroundColorByIntensity(intensidade);
 
           return (
             <div key={`chart-${index}`} className="flex flex-col items-center flex-1 max-w-[60px]">
