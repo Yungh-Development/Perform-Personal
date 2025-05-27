@@ -1,14 +1,14 @@
-import { IonContent, IonHeader, IonPage, IonFooter, IonTitle, IonToolbar, IonInput, IonItem, IonLabel, IonButton, useIonRouter, IonRange, IonToast } from '@ionic/react';
+import { IonContent, IonPage, IonFooter, IonInput, IonItem, IonLabel, IonButton, useIonRouter, IonRange, IonToast } from '@ionic/react';
 import React, { useState } from 'react';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import "./style.css"
+import HeaderTemplate from '../../../template/header/page';
 
 interface StudentData {
   id: string;
   nome: string;
-  sobrenome: string;
-  intensidade: string;
+  intensidade: number;
   observacao: string;
   performance: string;
   justificativa: string;
@@ -18,13 +18,12 @@ interface StudentData {
 interface StudentOptionType {
   inputValue?: string;
   nome: string;
-  sobrenome: string;
   id?: string;
 }
 
 const PerformanceForm: React.FC = () => {
   const [selectedStudent, setSelectedStudent] = useState<StudentOptionType | null>(null);
-  const [intensidade, setIntensidade] = useState('');
+  const [intensidade, setIntensidade] = useState(0);
   const [observacao, setObservacao] = useState('');
   const [performance, setPerformance] = useState('');
   const [justificativa, setJustificativa] = useState('');
@@ -39,7 +38,6 @@ const PerformanceForm: React.FC = () => {
     if (savedStudents) {
       return JSON.parse(savedStudents).map((student: any) => ({
         nome: student.nome,
-        sobrenome: student.sobrenome,
         id: student.id
       }));
     }
@@ -96,7 +94,6 @@ const PerformanceForm: React.FC = () => {
     const studentData: StudentData = {
       id: Date.now().toString(),
       nome: selectedStudent.nome,
-      sobrenome: selectedStudent.sobrenome,
       intensidade,
       observacao,
       performance,
@@ -112,7 +109,7 @@ const PerformanceForm: React.FC = () => {
       setToastMensagem("Aluno Cadastrado!");
       setShowToast(true);
       setSelectedStudent(null);
-      setIntensidade('');
+      setIntensidade(0);
       setPerformance('');
       setSelectedIcon(null);
       setJustificativa('');
@@ -129,18 +126,7 @@ const PerformanceForm: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar className="bg-blue-600">
-            <div className="flex w-full ion-padding">
-                <IonButton color="yellow-personal" shape="round" onClick={()=> router.push("/home")}>
-                  <ion-icon name="arrow-back" slot="icon-only" color="black"></ion-icon>                         
-                </IonButton>
-                <div className="flex justify-center items-center">
-                    <IonTitle className="text-white ml-10">Novo Relatório</IonTitle>
-                </div>
-            </div>
-        </IonToolbar>
-      </IonHeader>
+      <HeaderTemplate titlePage="Novo Relatório" urlTemplate='/home'/>
       <IonContent className="h-screen" >
         <div className="ion-padding ">
           <h2 className="text-xl font-bold mb-6 text-white">Novo aluno</h2>          
@@ -154,12 +140,10 @@ const PerformanceForm: React.FC = () => {
                       if (typeof newValue === 'string') {
                         setSelectedStudent({
                           nome: newValue,
-                          sobrenome: ''
                         });
                       } else if (newValue && newValue.inputValue) {
                         setSelectedStudent({
                           nome: newValue.inputValue,
-                          sobrenome: ''
                         });
                       } else {
                         setSelectedStudent(newValue);
@@ -191,14 +175,13 @@ const PerformanceForm: React.FC = () => {
                       const filtered = filter(options, params);
                       const { inputValue } = params;
                       const isExisting = options.some(
-                        (option) => inputValue === `${option.nome} ${option.sobrenome}`
+                        (option) => inputValue === `${option.nome}`
                       );
                       
                       if (inputValue !== '' && !isExisting) {
                         filtered.push({
                           inputValue,
                           nome: `Adicionar "${inputValue}"`,
-                          sobrenome: ''
                         });
                       }
 
@@ -212,11 +195,11 @@ const PerformanceForm: React.FC = () => {
                     getOptionLabel={(option) => {
                       if (typeof option === 'string') return option;
                       if (option.inputValue) return option.inputValue;
-                      return `${option.nome} ${option.sobrenome}`;
+                      return `${option.nome}`;
                     }}
                     renderOption={(props, option) => (
                       <li {...props} style={{ backgroundColor: '#333', color: 'white' }}>
-                        {option.inputValue ? option.nome : `${option.nome} ${option.sobrenome}`}
+                        {option.inputValue ? option.nome : `${option.nome}`}
                       </li>
                     )}
                     freeSolo

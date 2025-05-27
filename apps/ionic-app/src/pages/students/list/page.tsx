@@ -1,17 +1,14 @@
-import { 
-  IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonList, 
-  IonItem, IonLabel, IonButton, IonIcon, IonBadge, IonFooter, 
-  IonAlert, IonToast
-} from '@ionic/react';
+import { IonContent, IonPage, IonList, IonItem, IonLabel, IonButton, IonIcon, IonAlert, IonToast } from '@ionic/react';
 import { trash, barChart } from 'ionicons/icons';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import HeaderTemplate from '../../template/header/page';
+import FooterTemplate from '../../template/footer/page';
 
 interface StudentData {
   id: string;
   nome: string;
-  sobrenome: string;
-  intensidade: string;
+  intensidade: number;
   observacao: string;
   performance: string;
   justificativa: string;
@@ -63,18 +60,7 @@ const StudentsList: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar className="bg-blue-600">
-          <div className="flex w-full ion-padding">
-            <IonButton color="yellow-personal" shape="round" onClick={() => history.push("/home")}>
-              <IonIcon name="arrow-back" slot="icon-only" color="black" />
-            </IonButton>
-            <div className="flex justify-center items-center">
-              <IonTitle className="text-white ml-10">Alunos Cadastrados</IonTitle>
-            </div>
-          </div>
-        </IonToolbar>
-      </IonHeader>      
+      <HeaderTemplate titlePage="Alunos Cadastrados" urlTemplate="/home" />    
       <IonContent className="ion-padding-bottom">
         <div className="pb-20">
           <IonList>
@@ -88,7 +74,7 @@ const StudentsList: React.FC = () => {
                   <div className="w-full">
                     <div className="flex justify-between items-center">
                       <IonLabel>
-                        <h1 className="font-bold">{student.nome} {student.sobrenome}</h1>                     
+                        <h1 className="font-bold">{student.nome}</h1>                     
                       </IonLabel>                    
                       <div className="flex items-center space-x-6">                                   
                         <IonButton 
@@ -123,36 +109,7 @@ const StudentsList: React.FC = () => {
           </div>
         </div>
       </IonContent>
-      <IonFooter className="relative">
-        <div className="absolute bg-amber-500 rounded-full w-14 h-14 flex items-center justify-center left-1/2 -ml-7 -top-1/2">
-          <div className="flex">
-            <a href="/formulario-performance" className="mt-2">
-              <ion-icon name="add" color="black" size="large"></ion-icon>
-            </a>
-          </div>
-        </div>
-        <div className="flex items-center py-4">
-          <div className="flex justify-around w-full">
-            <IonButton fill="clear">
-              <a href="/home">
-                <ion-icon name="grid" size="large"></ion-icon>
-              </a>
-            </IonButton>       
-            <IonButton fill="clear">
-              <a href="/relatorio">
-                <ion-icon name="pie" size="large"></ion-icon>
-              </a>
-            </IonButton>
-          </div>
-          <div className="w-full flex justify-center">      
-            <IonButton fill="clear">
-              <a href="/lista-alunos">
-                <ion-icon name="people" size="large"></ion-icon>
-              </a>
-            </IonButton>  
-          </div>  
-        </div>
-      </IonFooter>
+      <FooterTemplate/>
       <IonAlert
         isOpen={showAlert}
         onDidDismiss={() => setShowAlert(false)}

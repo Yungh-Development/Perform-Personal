@@ -1,5 +1,6 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonInput, IonItem, IonLabel, IonButton, useIonRouter, IonToast } from '@ionic/react';
+import { IonContent,  IonPage, IonInput, IonItem, IonButton, useIonRouter, IonToast } from '@ionic/react';
 import React, { useState } from 'react';
+import HeaderTemplate from '../../../template/header/page';
 
 interface StudentData {
   id: string;
@@ -41,18 +42,7 @@ const StudentAddForm: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar className="bg-blue-600">
-          <div className="flex w-full ion-padding">
-            <IonButton color="yellow-personal" shape="round" onClick={() => router.push("/home")}>
-              <ion-icon name="arrow-back" slot="icon-only" color="black"></ion-icon>
-            </IonButton>
-            <div className="flex justify-center items-center">
-              <IonTitle className="text-white ml-10">Novo Aluno</IonTitle>
-            </div>
-          </div>
-        </IonToolbar>
-      </IonHeader>      
+      <HeaderTemplate titlePage="Novo Aluno" urlTemplate="/home" />     
       <IonContent className="ion-padding">
         <div className="max-w-md mx-auto">
           <h2 className="text-xl font-bold mb-6 text-white">Cadastrar Aluno</h2>

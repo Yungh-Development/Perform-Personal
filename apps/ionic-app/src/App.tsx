@@ -11,6 +11,7 @@ import HomePage from './pages/home/page';
 import PerformanceForm from './pages/students/form/performance/page';
 import StudentList from './pages/students/list/page';
 import StudentAddForm from './pages/students/form/add/page';
+import ReportList from './pages/report/list/page';
 import './index.css'
 
 
@@ -43,6 +44,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import StudentDetails from './pages/report/details/page';
 
 setupIonicReact();
 
@@ -66,7 +68,12 @@ const App: React.FC = () => (
           <Route exact path="/lista-alunos">
             <StudentList />
           </Route>
-        
+          <Route exact path="/relatorio">
+            <ReportList/>
+          </Route>
+          <Route exact path="/student-details/:id">
+            <StudentDetails/>
+          </Route>
         </IonRouterOutlet>
       </IonTabs>
     </IonReactRouter>
