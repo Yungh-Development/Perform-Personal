@@ -1,160 +1,430 @@
-import { IonContent, IonPage, IonList, IonItem, IonLabel } from '@ionic/react';
-import React, { useEffect, useState } from 'react';
-import StorageOutlined from '@mui/icons-material/StorageOutlined';
-import DehazeOutlined from '@mui/icons-material/DehazeOutlined';
-import { useParams } from 'react-router-dom';
-import { svgIcons } from '../../students/constants';
-import { useHistory } from 'react-router-dom';
-import HeaderTemplate from '../../template/header/page';
-import FooterTemplate from '../../template/footer/page';
-import CustomIntensidade from './customNumber/page';
-import PerformanceChart from './chart/page';
+import {
+  IonContent,
+  IonPage,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonNote,
+  IonSpinner,
+  IonButton,
+  IonIcon,
+  IonToast,
+} from "@ionic/react";
+import React, { useEffect, useState, useCallback } from "react";
+import StorageOutlined from "@mui/icons-material/StorageOutlined";
+import DehazeOutlined from "@mui/icons-material/DehazeOutlined";
+import { useParams } from "react-router-dom";
+import { svgIcons } from "../../students/constants"; 
+import HeaderTemplate from "../../template/header/page"; 
+import FooterTemplate from "../../template/footer/page";
+import CustomIntensidade from "./customNumber/page";
+import PerformanceChart from "./chart/page"; 
 
-interface StudentData {
-  id: string;
-  nome: string;
-  intensidade: number;
-  observacao: string;
-  performance: string;
-  justificativa: string;
-  dataCadastro: string;
+import { db } from "../../../firebaseConfig"; 
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  Timestamp,
+  orderBy,
+} from "firebase/firestore";
+import { cloudUploadOutline } from "ionicons/icons";
+
+import { useReportStore, PerformanceReport } from "../../../components/reportStorage";
+import { backupReportsToFirebase, fetchAllReportsFromFirebase } from "../../../utils/firebase";
+
+interface StudentDetailsData extends Omit<PerformanceReport, "dataCadastro"> {
+  dataCadastro: Timestamp | null;
 }
 
-const StudentDetails: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [student, setStudent] = useState<StudentData | null>(null);
-  const [records, setRecords] = useState<StudentData[]>([]);
-  const [standardReport, setStandardReport] = useState(true);
+const mapToStudentDetailsData = (id: string, rawData: any): StudentDetailsData => {
+    let timestamp: Timestamp | null = null;
+    const rawTimestamp = rawData?.dataCadastro;
 
-  const history = useHistory();
+    if (rawTimestamp instanceof Timestamp) {
+        timestamp = rawTimestamp;
+    } else if (rawTimestamp && typeof rawTimestamp === "object" && "seconds" in rawTimestamp && "nanoseconds" in rawTimestamp) {
+        try {
+            timestamp = new Timestamp(rawTimestamp.seconds, rawTimestamp.nanoseconds);
+        } catch (e) { console.error("Erro ao criar Timestamp a partir de objeto:", e); }
+    } else if (typeof rawTimestamp === "string") {
+        try {
+            const date = new Date(rawTimestamp);
+            if (!isNaN(date.getTime())) {
+                timestamp = Timestamp.fromDate(date);
+            }
+        } catch (e) { console.error("Erro ao criar Timestamp a partir de string:", e); }
+    }
+
+    return {
+        id: id,
+        studentId: rawData?.studentId ?? null,
+        nome: rawData?.nome ?? "Nome Indefinido",
+        intensidade: rawData?.intensidade ?? 0,
+        observacao: rawData?.observacao ?? "",
+        performance: rawData?.performance ?? "Desconhecida",
+        justificativa: rawData?.justificativa ?? "",
+        dataCadastro: timestamp, 
+    };
+};
+
+const StudentDetails: React.FC = () => {
+  const { id: reportId } = useParams<{ id: string }>();
+  const [studentReport, setStudentReport] = useState<StudentDetailsData | null>(null);
+  const [historyRecords, setHistoryRecords] = useState<StudentDetailsData[]>([]);
+  const [standardReportView, setStandardReportView] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  const reportsFromStore = useReportStore((state) => state.reports);
+  const setReportsInStore = useReportStore((state) => state.setReports);
+
+  const formatarData = (timestampInput: any): string => {
+    let timestamp: Timestamp | null = null;
+    if (timestampInput instanceof Timestamp) {
+      timestamp = timestampInput;
+    } else if (typeof timestampInput === "string") {
+      try {
+        const date = new Date(timestampInput);
+        if (!isNaN(date.getTime())) {
+          timestamp = Timestamp.fromDate(date);
+        }
+      } catch {}
+    } else if (
+      typeof timestampInput === "object" &&
+      timestampInput !== null &&
+      "seconds" in timestampInput &&
+      "nanoseconds" in timestampInput
+    ) {
+      try {
+        timestamp = new Timestamp(
+          timestampInput.seconds,
+          timestampInput.nanoseconds
+        );
+      } catch {}
+    }
+
+    if (timestamp) {
+      try {
+        const data = timestamp.toDate();
+        const formatter = new Intl.DateTimeFormat("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+        });
+        return formatter.format(data).replace(",", " "); 
+      } catch (e) {
+        console.error("Erro ao formatar Timestamp válido:", e, timestamp);
+        return "Erro fmt";
+      }
+    } else {
+      return "Inválida";
+    }
+  };
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    let reportData: StudentDetailsData | null = null;
+    let historyData: StudentDetailsData[] = [];
+    let foundLocally = false;
+
+    const localReportRaw = reportsFromStore.find((r) => r.id === reportId);
+    if (localReportRaw) {
+      console.log("Relatório encontrado localmente:", localReportRaw);
+      reportData = mapToStudentDetailsData(localReportRaw.id, localReportRaw);
+      setStudentReport(reportData);
+      foundLocally = true;
+
+      const localHistory = reportsFromStore
+        .filter(
+          (r) =>
+            r.nome === reportData?.nome ||
+            (reportData?.studentId && r.studentId === reportData.studentId)
+        )
+        .map(r => mapToStudentDetailsData(r.id, r))
+        .sort((a, b) => {
+          const aMillis = a.dataCadastro?.toMillis?.() ?? 0;
+          const bMillis = b.dataCadastro?.toMillis?.() ?? 0;
+          return bMillis - aMillis;
+        });
+      historyData = localHistory.map(r => mapToStudentDetailsData(r.id, r));
+      setHistoryRecords(historyData);
+    } else {
+        console.log("Relatório não encontrado localmente, buscando no Firebase...");
+    }
+
+    try {
+      const docRef = doc(db, "performanceReports", reportId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const firebaseReport = mapToStudentDetailsData(docSnap.id, docSnap.data());
+        console.log("Relatório encontrado no Firebase:", firebaseReport);
+        reportData = firebaseReport;
+        setStudentReport(reportData);
+
+        if (reportData) {
+            const reportsCollection = collection(db, "performanceReports");
+            let q;
+            if (reportData.studentId) {
+                q = query(
+                    reportsCollection,
+                    where("studentId", "==", reportData.studentId),
+                    orderBy("dataCadastro", "desc")
+                );
+            } else {
+                 q = query(
+                    reportsCollection,
+                    where("nome", "==", reportData.nome),
+                    orderBy("dataCadastro", "desc")
+                );
+            }
+            
+            const querySnapshot = await getDocs(q);
+            const firebaseHistory = querySnapshot.docs.map((d) => mapToStudentDetailsData(d.id, d.data()));
+            historyData = firebaseHistory;
+            setHistoryRecords(historyData);
+        }
+
+      } else {
+        if (!foundLocally) {
+          console.error(`Relatório com ID ${reportId} não encontrado localmente nem no Firebase.`);
+          setError("Relatório não encontrado.");
+          setStudentReport(null);
+          setHistoryRecords([]);
+        } else {
+            console.log("Relatório não encontrado no Firebase, usando dados locais.");
+        }
+      }
+    } catch (err) {
+      console.error("Erro ao buscar dados do Firebase:", err);
+      if (!foundLocally) {
+        setError("Erro ao carregar dados. Verifique a conexão.");
+        setStudentReport(null);
+        setHistoryRecords([]);
+      } else {
+          setError("Erro ao buscar dados atualizados. Exibindo dados locais.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [reportId, reportsFromStore]);
+
+  const handleSync = async () => {
+    setIsSyncing(true);
+    setToastMessage("Iniciando backup e atualização...");
+    setShowToast(true);
+    let fetchError = false;
+
+    try {
+      const backupResult = await backupReportsToFirebase(reportsFromStore);
+      setToastMessage(
+        `Backup: ${backupResult.uploaded} enviados, ${backupResult.skipped} pulados, ${backupResult.errors} erros.`
+      );
+      setShowToast(true);
+      await new Promise(resolve => setTimeout(resolve, backupResult.errors > 0 ? 3500 : 2500));
+
+      setToastMessage("Buscando dados atualizados...");
+      setShowToast(true);
+      const firebaseReports = await fetchAllReportsFromFirebase();
+      setReportsInStore(firebaseReports);
+      setToastMessage(
+        `Atualização concluída. ${firebaseReports.length} relatórios carregados.`
+      );
+      setShowToast(true);
+      
+      await fetchData(); 
+
+    } catch (error) {
+      console.error("Erro durante a sincronização manual (detalhes):", error);
+      setToastMessage("Erro na sincronização. Verifique o console.");
+      setShowToast(true);
+      fetchError = true;
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   useEffect(() => {
-    const savedData = localStorage.getItem('studentsData');
-    if (savedData) {
-      const allStudents = JSON.parse(savedData);
-      const studentData = allStudents.find((s: StudentData) => s.id === id);
-      const studentRecords = allStudents.filter((s: StudentData) => s.nome === studentData?.nome);
-      
-      setStudent(studentData);
-      setRecords(studentRecords);
+    if (reportId) {
+      fetchData();
     }
-  }, [id]);
+  }, [reportId, fetchData]);
 
-  if (!student) {
-    return <div>Carregando...</div>;
+  if (loading) {
+    return (
+      <IonPage>
+        <HeaderTemplate titlePage="Carregando..." urlTemplate="/relatorio" />
+        <IonContent className="ion-padding-bottom">
+          <div className="flex justify-center items-center h-full">
+            <IonSpinner name="crescent" />
+          </div>
+        </IonContent>
+        <FooterTemplate />
+      </IonPage>
+    );
   }
 
-  console.log(records)
+  if (error || !studentReport) {
+    return (
+      <IonPage>
+        <HeaderTemplate titlePage="Erro" urlTemplate="/relatorio" />
+        <IonContent className="ion-padding-bottom">
+          <div className="flex flex-col justify-center items-center h-full text-center p-8">
+            <IonNote color="danger" className="text-lg mb-4">
+              {error || "Relatório não encontrado"}
+            </IonNote>
+            <IonButton onClick={fetchData} color="primary" fill="outline">
+              Tentar novamente
+            </IonButton>
+          </div>
+        </IonContent>
+        <FooterTemplate />
+      </IonPage>
+    );
+  }
+
   return (
     <IonPage>
-      <HeaderTemplate titlePage={student.nome} urlTemplate="/relatorio" />
+      <HeaderTemplate
+        titlePage={studentReport.nome} 
+        urlTemplate="/relatorio"
+        showSyncButton={true}
+        onSyncClick={handleSync}
+        isSyncing={isSyncing}
+      />
+
       <IonContent className="ion-padding-bottom">
         <div className="pb-20 w-full">
           <div className="mb-6">
-            <h2 className="text-lg font-semibold p-2">{`Últimos ${records.slice(-5).length} Treinos`}</h2>
-            <PerformanceChart 
-            data={records.slice(-5).map(record => ({ 
-                intensidade: record.intensidade,
-                dataCadastro: record.dataCadastro 
-            }))} 
-            />
+            <h2 className="text-lg font-semibold p-2">
+              {`Últimos ${Math.min(5, historyRecords.length)} Treinos`}
+            </h2>
+            {historyRecords.length > 0 ? (
+                <PerformanceChart
+                  data={historyRecords.slice(0, 5).map((record) => ({
+                    intensidade: record.intensidade,
+                    dataCadastro: formatarData(record.dataCadastro),
+                  }))}
+                />
+            ) : (
+                <div className="text-center p-4 text-gray-500">Sem histórico para exibir gráfico.</div>
+            )}
           </div>
-          <div className="flex w-full justify-between">
-            <h2 className="text-lg font-semibold p-2 mt-4 ion-padding">Relatórios</h2>
+
+          <div className="flex w-full justify-between items-center">
+            <h2 className="text-lg font-semibold p-2 mt-4 ion-padding">Histórico</h2>
             <div className="flex mr-8 p-2 mt-4 ion-padding">
-              <div className="mr-10" onClick={()=> setStandardReport(false)}>
-                {standardReport ? (<StorageOutlined sx={{color: "white"}}/>): (<StorageOutlined sx={{color: "green"}}/>)}
+              <div className="mr-10" onClick={() => setStandardReportView(false)}>
+                {standardReportView ? (
+                  <StorageOutlined sx={{ color: "white" }} />
+                ) : (
+                  <StorageOutlined sx={{ color: "green" }} />
+                )}
               </div>
-              <div onClick={()=> setStandardReport(true)}>
-                {standardReport ? (<DehazeOutlined sx={{color: "green"}}/>): (<DehazeOutlined sx={{color: "white"}}/>)}
+              <div onClick={() => setStandardReportView(true)}>
+                {standardReportView ? (
+                  <DehazeOutlined sx={{ color: "green" }} />
+                ) : (
+                  <DehazeOutlined sx={{ color: "white" }} />
+                )}
               </div>
             </div>
           </div>
-          {standardReport ? (
-            <div>
-              <IonList className="ion-padding">
-                {records.map((record, index) => {
-                  const performanceIcon = svgIcons[record.performance as keyof typeof svgIcons];
-                  return (
-                    <IonItem key={`report-${index}`} className="" onClick={() => history.push(`/student-details/${student.id}`)}>
-                      <div className="w-full flex items-center h-20">
-                        <div className="w-full flex justify-between items-center ">
-                          <IonLabel>
-                            <CustomIntensidade 
-                              value={record.intensidade}
-                            />
-                          </IonLabel>
-                          <IonLabel>                            
-                            <div>
-                              {performanceIcon.icon}
-                            </div>                         
-                          </IonLabel>
-                          <IonLabel>
-                            <h2 className="font-bold">{student.nome}</h2>                     
-                          </IonLabel>
-                          <IonLabel>
-                            <p className="flex float-end font-bold">
-                              {new Date(record.dataCadastro).toLocaleDateString()}
+
+          {historyRecords.length === 0 && !loading && (
+              <div className="text-center p-8 text-gray-500">Nenhum histórico encontrado para este aluno.</div>
+          )}
+          {standardReportView ? (
+            <IonList className="ion-padding">
+              {historyRecords.map((record) => (
+                <IonItem key={`hist-${record.id}`}>
+                  <div className="w-full flex items-center h-20">
+                    <div className="w-full flex justify-between items-center">
+                      <IonLabel className="flex-none w-12 text-center">
+                        <CustomIntensidade value={record.intensidade} />
+                      </IonLabel>
+                      <IonLabel className="flex-none w-10 text-center">
+                        <div>
+                          {svgIcons[record.performance as keyof typeof svgIcons]?.icon || <IonNote>?</IonNote>}
+                        </div>
+                      </IonLabel>
+                      <IonLabel className="flex-grow text-right">
+                        <p className="text-sm font-bold">
+                          {formatarData(record.dataCadastro)}
+                        </p>
+                      </IonLabel>
+                    </div>
+                  </div>
+                </IonItem>
+              ))}
+            </IonList>
+          ) : (
+            <IonList className="ion-padding">
+              {historyRecords.map((record) => (
+                <IonItem key={`hist-detail-${record.id}`}>
+                  <div className="w-full flex flex-col justify-start items-start h-full pt-4">
+                    <div className="w-full h-full flex justify-between items-start mb-4">
+                      <IonLabel className="flex-grow basis-1/3">
+                        <div className="flex flex-col">
+                          <span className="pb-2 text-sm text-gray-400">Intensidade</span>
+                          <CustomIntensidade value={record.intensidade} />
+                        </div>
+                      </IonLabel>
+                      <IonLabel className="flex-grow basis-1/3 text-center">
+                        <span className="text-sm text-gray-400">Performance</span>
+                        <p className="pt-2">
+                          {svgIcons[record.performance as keyof typeof svgIcons]?.icon}
+                        </p>
+                      </IonLabel>
+                      <IonLabel className="flex-grow basis-1/3 text-right">
+                        <div className="flex flex-col items-end">
+                            <span className="pb-2 text-sm text-gray-400">Data</span>
+                            <p className="font-bold">
+                            {formatarData(record.dataCadastro)}
                             </p>
-                          </IonLabel>      
                         </div>
-                      </div>
-                    </IonItem>
-                  );
-                })}              
-              </IonList>
-            </div> ):(
-            <div>
-              <IonList className="ion-padding">
-                {records.map((record, index) => {
-                  const performanceIcon = svgIcons[record.performance as keyof typeof svgIcons];
-                  return (
-                    <IonItem key={`report-${index}`} className="" onClick={() => history.push(`/student-details/${student.id}`)}>
-                      <div className="w-full flex flex-col justify-start ion items-center h-full  pt-4">
-                        <div className="w-full h-full flex justify-between">
-                          <IonLabel>
-                            <div className="flex flex-col">
-                              <span className="pb-4">Intensidade</span>
-                              <CustomIntensidade 
-                                value={record.intensidade}
-                              />
-                            </div>                       
-                          </IonLabel>
-                          <IonLabel>                            
-                            <span>Performance</span>
-                            <p className="pt-4">{performanceIcon.icon}</p>
-                          </IonLabel>
-                          <IonLabel>
-                            <div>
-                              <p className="flex float-end font-bold pb-4">
-                                {new Date(record.dataCadastro).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </IonLabel>      
-                        </div>
-                        <div className="flex w-full h-full flex-col">       
-                          <IonLabel className="py-6">
-                            <span className="pb-4">Observação: </span>
-                            <p>{record.observacao}</p>
-                          </IonLabel>                 
-                          <IonLabel className="py-6">
-                            <span className="pb-4">Justificativa: </span>
-                        
-                              <p>{record.justificativa}</p>
-                        
-                          </IonLabel>                                         
-                        </div>                   
-                      </div>
-                    </IonItem>
-                  );
-                })}              
-              </IonList>
-            </div>)}
+                      </IonLabel>
+                    </div>
+                    <div className="flex w-full h-full flex-col mt-2 border-t border-gray-700 pt-4">
+                      <IonLabel className="mb-4">
+                        <span className="text-sm text-gray-400">Observação: </span>
+                        <p className="mt-1 text-white">{record.observacao || "-"}</p>
+                      </IonLabel>
+                      <IonLabel>
+                        <span className="text-sm text-gray-400">Justificativa: </span>
+                        <p className="mt-1 text-white">{record.justificativa || "-"}</p>
+                      </IonLabel>
+                    </div>
+                  </div>
+                </IonItem>
+              ))}
+            </IonList>
+          )}
         </div>
       </IonContent>
       <FooterTemplate />
+      <IonToast
+        isOpen={showToast}
+        onDidDismiss={() => setShowToast(false)}
+        message={toastMessage}
+        duration={3000}
+        position="top"
+        color={toastMessage.toLowerCase().includes("erro") ? "danger" : "success"}
+      />
     </IonPage>
   );
 };
 
 export default StudentDetails;
+
