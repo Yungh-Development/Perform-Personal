@@ -31,17 +31,15 @@ import {
   Timestamp,
   orderBy,
 } from "firebase/firestore";
-import { cloudUploadOutline } from "ionicons/icons";
 
 import { useReportStore, PerformanceReport } from "../../../components/reportStorage";
 import { backupReportsToFirebase, fetchAllReportsFromFirebase } from "../../../utils/firebase";
 
-interface StudentDetailsData extends Omit<PerformanceReport, "dataCadastro"> {
-  dataCadastro: Timestamp | null;
-}
+
+interface StudentDetailsData extends PerformanceReport {}
 
 const mapToStudentDetailsData = (id: string, rawData: any): StudentDetailsData => {
-    let timestamp: Timestamp | null = null;
+    let timestamp: Timestamp | Date | string;
     const rawTimestamp = rawData?.dataCadastro;
 
     if (rawTimestamp instanceof Timestamp) {
@@ -49,14 +47,24 @@ const mapToStudentDetailsData = (id: string, rawData: any): StudentDetailsData =
     } else if (rawTimestamp && typeof rawTimestamp === "object" && "seconds" in rawTimestamp && "nanoseconds" in rawTimestamp) {
         try {
             timestamp = new Timestamp(rawTimestamp.seconds, rawTimestamp.nanoseconds);
-        } catch (e) { console.error("Erro ao criar Timestamp a partir de objeto:", e); }
+        } catch (e) { 
+            console.error("Erro ao criar Timestamp a partir de objeto:", e);
+            timestamp = Timestamp.fromDate(new Date(0));
+        }
     } else if (typeof rawTimestamp === "string") {
         try {
             const date = new Date(rawTimestamp);
             if (!isNaN(date.getTime())) {
                 timestamp = Timestamp.fromDate(date);
+            } else {
+                timestamp = Timestamp.fromDate(new Date(0)); 
             }
-        } catch (e) { console.error("Erro ao criar Timestamp a partir de string:", e); }
+        } catch (e) { 
+            console.error("Erro ao criar Timestamp a partir de string:", e);
+            timestamp = Timestamp.fromDate(new Date(0))
+        }
+    } else {
+        timestamp = Timestamp.fromDate(new Date(0)); 
     }
 
     return {
@@ -131,101 +139,112 @@ const StudentDetails: React.FC = () => {
     }
   };
 
+  const combineAndDeduplicateReports = useCallback((localReports: PerformanceReport[], firebaseReports: PerformanceReport[]): PerformanceReport[] => {
+    const allReports = [...localReports, ...firebaseReports];
+    const uniqueReportsMap = new Map<string, PerformanceReport>();
+
+    allReports.forEach(report => {
+      const reportDate = report.dataCadastro instanceof Timestamp 
+        ? report.dataCadastro.toMillis() 
+        : new Date(report.dataCadastro).getTime();
+      
+      const key = `${report.studentId || report.nome}-${reportDate}`;
+
+      uniqueReportsMap.set(key, report);
+    });
+
+    return Array.from(uniqueReportsMap.values()).sort((a, b) => {
+      const dateA = a.dataCadastro instanceof Timestamp 
+        ? a.dataCadastro.toMillis() 
+        : new Date(a.dataCadastro).getTime();
+      
+      const dateB = b.dataCadastro instanceof Timestamp 
+        ? b.dataCadastro.toMillis() 
+        : new Date(b.dataCadastro).getTime();
+      
+      return dateB - dateA; 
+    });
+  }, []);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
-    let reportData: StudentDetailsData | null = null;
-    let historyData: StudentDetailsData[] = [];
-    let foundLocally = false;
-
-    const localReportRaw = reportsFromStore.find((r) => r.id === reportId);
-    if (localReportRaw) {
-      console.log("Relatório encontrado localmente:", localReportRaw);
-      reportData = mapToStudentDetailsData(localReportRaw.id, localReportRaw);
-      setStudentReport(reportData);
-      foundLocally = true;
-
-      const localHistory = reportsFromStore
-        .filter(
-          (r) =>
-            r.nome === reportData?.nome ||
-            (reportData?.studentId && r.studentId === reportData.studentId)
-        )
-        .map(r => mapToStudentDetailsData(r.id, r))
-        .sort((a, b) => {
-          const aMillis = a.dataCadastro?.toMillis?.() ?? 0;
-          const bMillis = b.dataCadastro?.toMillis?.() ?? 0;
-          return bMillis - aMillis;
-        });
-      historyData = localHistory.map(r => mapToStudentDetailsData(r.id, r));
-      setHistoryRecords(historyData);
-    } else {
-        console.log("Relatório não encontrado localmente, buscando no Firebase...");
-    }
+    let currentReport: StudentDetailsData | null = null;
+    let combinedHistory: PerformanceReport[] = []; 
 
     try {
       const docRef = doc(db, "performanceReports", reportId);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        const firebaseReport = mapToStudentDetailsData(docSnap.id, docSnap.data());
-        console.log("Relatório encontrado no Firebase:", firebaseReport);
-        reportData = firebaseReport;
-        setStudentReport(reportData);
-
-        if (reportData) {
-            const reportsCollection = collection(db, "performanceReports");
-            let q;
-            if (reportData.studentId) {
-                q = query(
-                    reportsCollection,
-                    where("studentId", "==", reportData.studentId),
-                    orderBy("dataCadastro", "desc")
-                );
-            } else {
-                 q = query(
-                    reportsCollection,
-                    where("nome", "==", reportData.nome),
-                    orderBy("dataCadastro", "desc")
-                );
-            }
-            
-            const querySnapshot = await getDocs(q);
-            const firebaseHistory = querySnapshot.docs.map((d) => mapToStudentDetailsData(d.id, d.data()));
-            historyData = firebaseHistory;
-            setHistoryRecords(historyData);
-        }
-
+        currentReport = mapToStudentDetailsData(docSnap.id, docSnap.data());
+        console.log("Relatório principal encontrado no Firebase:", currentReport);
       } else {
-        if (!foundLocally) {
+        const localReportRaw = reportsFromStore.find((r) => r.id === reportId);
+        if (localReportRaw) {
+          currentReport = mapToStudentDetailsData(localReportRaw.id, localReportRaw);
+          console.log("Relatório principal encontrado localmente:", currentReport);
+        } else {
           console.error(`Relatório com ID ${reportId} não encontrado localmente nem no Firebase.`);
           setError("Relatório não encontrado.");
           setStudentReport(null);
           setHistoryRecords([]);
-        } else {
-            console.log("Relatório não encontrado no Firebase, usando dados locais.");
+          setLoading(false);
+          return;
         }
       }
-    } catch (err) {
-      console.error("Erro ao buscar dados do Firebase:", err);
-      if (!foundLocally) {
-        setError("Erro ao carregar dados. Verifique a conexão.");
-        setStudentReport(null);
-        setHistoryRecords([]);
-      } else {
-          setError("Erro ao buscar dados atualizados. Exibindo dados locais.");
+
+      if (currentReport) {
+        setStudentReport(currentReport);
+
+        const reportsCollection = collection(db, "performanceReports");
+        let q;
+        if (currentReport.studentId) {
+            q = query(
+                reportsCollection,
+                where("studentId", "==", currentReport.studentId),
+                orderBy("dataCadastro", "desc")
+            );
+        } else {
+             q = query(
+                reportsCollection,
+                where("nome", "==", currentReport.nome),
+                orderBy("dataCadastro", "desc")
+            );
+        }
+        
+        const querySnapshot = await getDocs(q);
+        const firebaseHistory = querySnapshot.docs.map((d) => mapToStudentDetailsData(d.id, d.data()));
+
+        const localHistory = reportsFromStore
+          .filter(
+            (r) =>
+              r.nome === currentReport?.nome ||
+              (currentReport?.studentId && r.studentId === currentReport.studentId)
+          )
+          .map(r => mapToStudentDetailsData(r.id, r));
+
+        combinedHistory = combineAndDeduplicateReports(
+          localHistory, 
+          firebaseHistory
+        );
+        setHistoryRecords(combinedHistory); 
       }
+
+    } catch (err) {
+      console.error("Erro ao buscar dados:", err);
+      setError("Erro ao carregar dados. Verifique a conexão.");
+      setStudentReport(null);
+      setHistoryRecords([]);
     } finally {
       setLoading(false);
     }
-  }, [reportId, reportsFromStore]);
+  }, [reportId, reportsFromStore, combineAndDeduplicateReports]);
 
   const handleSync = async () => {
     setIsSyncing(true);
     setToastMessage("Iniciando backup e atualização...");
     setShowToast(true);
-    let fetchError = false;
-
     try {
       const backupResult = await backupReportsToFirebase(reportsFromStore);
       setToastMessage(
@@ -237,9 +256,12 @@ const StudentDetails: React.FC = () => {
       setToastMessage("Buscando dados atualizados...");
       setShowToast(true);
       const firebaseReports = await fetchAllReportsFromFirebase();
-      setReportsInStore(firebaseReports);
+      
+      const combinedAndDeduplicated = combineAndDeduplicateReports(reportsFromStore, firebaseReports);
+      setReportsInStore(combinedAndDeduplicated);
+      
       setToastMessage(
-        `Atualização concluída. ${firebaseReports.length} relatórios carregados.`
+        `Atualização concluída. ${combinedAndDeduplicated.length} relatórios carregados.`
       );
       setShowToast(true);
       
@@ -249,7 +271,6 @@ const StudentDetails: React.FC = () => {
       console.error("Erro durante a sincronização manual (detalhes):", error);
       setToastMessage("Erro na sincronização. Verifique o console.");
       setShowToast(true);
-      fetchError = true;
     } finally {
       setIsSyncing(false);
     }
@@ -303,7 +324,6 @@ const StudentDetails: React.FC = () => {
         onSyncClick={handleSync}
         isSyncing={isSyncing}
       />
-
       <IonContent className="ion-padding-bottom">
         <div className="pb-20 w-full">
           <div className="mb-6">
@@ -321,7 +341,6 @@ const StudentDetails: React.FC = () => {
                 <div className="text-center p-4 text-gray-500">Sem histórico para exibir gráfico.</div>
             )}
           </div>
-
           <div className="flex w-full justify-between items-center">
             <h2 className="text-lg font-semibold p-2 mt-4 ion-padding">Histórico</h2>
             <div className="flex mr-8 p-2 mt-4 ion-padding">
@@ -341,7 +360,6 @@ const StudentDetails: React.FC = () => {
               </div>
             </div>
           </div>
-
           {historyRecords.length === 0 && !loading && (
               <div className="text-center p-8 text-gray-500">Nenhum histórico encontrado para este aluno.</div>
           )}
@@ -427,4 +445,3 @@ const StudentDetails: React.FC = () => {
 };
 
 export default StudentDetails;
-
