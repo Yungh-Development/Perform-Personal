@@ -5,7 +5,7 @@ const WelcomePage: React.FC = () => {
   return (
     <IonPage>
       <IonCard> 
-        <IonCardContent className="ion-no-padding">
+        <IonCardContent className="h-screen ion-no-padding">
           <div className="h-screen">
             <div className="relative w-full xl:h-[70%] lg:h-[60%]">
               <span className="text-amber-500 text-[8px] absolute bottom-0 right-0">Gabi Moraes<br/> Personal</span>

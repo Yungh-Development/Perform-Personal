@@ -1,17 +1,29 @@
 import React from 'react';
 import { getBackgroundColorByIntensity } from '../../../../utils/getColor';
+import { Timestamp } from 'firebase/firestore';
 
 interface PerformanceChartProps {
   data: { 
     intensidade: number;
-    dataCadastro: string; 
+    dataCadastro: string | Date | Timestamp; 
   }[];
 }
 
 const PerformanceChart: React.FC<PerformanceChartProps> = ({ data }) => {
-  if (data.length === 0) {
+  const parseDate = (dateInput: string | Date | Timestamp): Date => {
+    if (dateInput instanceof Timestamp) {
+      return dateInput.toDate();
+    } else if (typeof dateInput === 'string') {
+      return new Date(dateInput);
+    }
+    return dateInput;
+  };
+
+  console.log(data)
+
+  if (!data || data.length === 0) {
     return (
-      <div className="text-center p-5 text-white bg-gray-50 rounded-lg">
+      <div className="text-center p-5 text-white bg-stone-800 rounded-lg shadow-sm">
         Nenhum dado de desempenho disponível
       </div>
     );
@@ -26,8 +38,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({ data }) => {
         {data.map((item, index) => {
           const intensidade = Math.min(Math.max(item.intensidade, 0), 10);
           const porcentagem = intensidade * 10;
-          
           const barColor = getBackgroundColorByIntensity(intensidade);
+          const date = parseDate(item.dataCadastro);
 
           return (
             <div key={`chart-${index}`} className="flex flex-col items-center flex-1 max-w-[60px]">
@@ -38,7 +50,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({ data }) => {
                 />
               </div>
               <div className="mt-1 text-xs text-white text-center">
-                {new Date(item.dataCadastro).toLocaleDateString('pt-BR', {
+                {date.toLocaleDateString('pt-BR', {
                   day: '2-digit',
                   month: 'short',
                   year: 'numeric'
