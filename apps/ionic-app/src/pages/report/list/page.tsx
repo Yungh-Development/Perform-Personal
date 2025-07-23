@@ -315,9 +315,6 @@ const ReportListZustand_v2: React.FC = () => {
                     <div className="w-full flex justify-between items-center">
                       <IonLabel className="flex-grow">
                         <h2 className="font-bold">{student.name}</h2>
-                        <p className="text-sm text-gray-500">
-                          {formatDate(student.dataCadastro)}
-                        </p>
                       </IonLabel>
                       <div className="flex items-center space-x-4">
                         {performanceIcon && (
@@ -325,11 +322,7 @@ const ReportListZustand_v2: React.FC = () => {
                             {performanceIcon.icon}
                           </div>
                         )}
-                        {student.intensidade !== undefined && (
-                          <div className="flex-none w-8 text-center">
-                            <h2 className="font-bold text-lg">{student.intensidade}</h2>
-                          </div>
-                        )}
+                  
                       </div>
                     </div>
                   </IonItem>

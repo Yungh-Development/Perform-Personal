@@ -4,6 +4,7 @@ import {
   IonFooter,
   IonButton,
   IonToast,
+  useIonRouter,
 } from "@ionic/react";
 import React, { useState } from "react";
 import HeaderTemplate from "../../../template/header/page";
@@ -19,6 +20,8 @@ import StudentFormFields from "../../../../components/studentFormFields";
 const PerformanceForm: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMensagem, setToastMensagem] = useState("");
+
+  const router = useIonRouter();
 
   const {
     formData,
@@ -42,6 +45,7 @@ const PerformanceForm: React.FC = () => {
 
   const onSubmit = (e: React.FormEvent) => {
     handleSubmit(e, showToastMessage, showToastMessage);
+    router.push("/home")
   };
 
   const onSyncClick = () => {
