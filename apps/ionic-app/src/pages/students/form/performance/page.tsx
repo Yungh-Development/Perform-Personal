@@ -4,6 +4,14 @@ import {
   IonFooter,
   IonButton,
   IonToast,
+  useIonRouter,
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonItem,
+  IonLabel,
 } from "@ionic/react";
 import React, { useState } from "react";
 import HeaderTemplate from "../../../template/header/page";
@@ -19,6 +27,10 @@ import StudentFormFields from "../../../../components/studentFormFields";
 const PerformanceForm: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMensagem, setToastMensagem] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const router = useIonRouter();
 
   const {
     formData,
@@ -29,6 +41,7 @@ const PerformanceForm: React.FC = () => {
     setJustificativa,
     handleIconClick,
     handleSubmit,
+    resetForm,
   } = useStudentForm();
 
   const { loadStudents } = useStudentManager();
@@ -40,8 +53,29 @@ const PerformanceForm: React.FC = () => {
     setShowToast(true);
   };
 
-  const onSubmit = (e: React.FormEvent) => {
-    handleSubmit(e, showToastMessage, showToastMessage);
+const handleFormSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    await handleSubmit(e, showToastMessage, showToastMessage);
+    setFormSubmitted(true);
+    setShowSuccessModal(true);
+  } catch (error) {
+    console.error("Erro ao salvar relatório:", error);
+  }
+};
+
+  const handleAddMore = () => {
+    resetForm();
+    setShowSuccessModal(false);
+    setTimeout(() => {
+      const firstInput = document.querySelector('ion-autocomplete');
+      if (firstInput) (firstInput as HTMLElement).focus();
+    }, 100);
+  };
+
+  const handleSaveAndGoToReport = () => {
+    setShowSuccessModal(false);
+    router.push("/relatorio");
   };
 
   const onSyncClick = () => {
@@ -62,7 +96,7 @@ const PerformanceForm: React.FC = () => {
           <h2 className="text-xl font-bold mb-6 text-white">
             Novo Relatório de Aluno
           </h2>          
-          <form onSubmit={onSubmit} className="h-full w-full">
+          <form onSubmit={handleFormSubmit} className="h-full w-full">
             <div className="py-3 w-full">              
               <StudentAutocomplete
                 selectedStudent={formData.selectedStudent}
@@ -90,7 +124,7 @@ const PerformanceForm: React.FC = () => {
           <IonButton
             expand="block"
             type="submit"
-            onClick={onSubmit}
+            onClick={handleFormSubmit}
             disabled={isSaving}
             fill="clear"
             className="text-black font-semibold py-1 bg-amber-500 rounded-full w-full hover:opacity-90"
@@ -99,6 +133,42 @@ const PerformanceForm: React.FC = () => {
           </IonButton>
         </div>
       </IonFooter>
+
+      <IonModal isOpen={showSuccessModal} onDidDismiss={() => setShowSuccessModal(false)}>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>Relatório Salvo</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding">
+          <div className="flex flex-col h-full justify-center">
+            <IonItem lines="none" className="text-center">
+              <IonLabel className="text-lg">O que deseja fazer agora?</IonLabel>
+            </IonItem>
+            
+            <div className="mt-8 space-y-4">
+              <IonButton
+                expand="block"
+                onClick={handleAddMore}
+                fill="solid"
+                className="font-semibold"
+              >
+                Adicionar Mais
+              </IonButton>
+              
+              <IonButton
+                expand="block"
+                onClick={handleSaveAndGoToReport}
+                fill="outline"
+                className="font-semibold"
+              >
+                Salvar e Ir para Relatórios
+              </IonButton>
+            </div>
+          </div>
+        </IonContent>
+      </IonModal>
+
       <IonToast
         isOpen={showToast}
         onDidDismiss={() => setShowToast(false)}
@@ -111,4 +181,3 @@ const PerformanceForm: React.FC = () => {
 };
 
 export default PerformanceForm;
-
