@@ -128,12 +128,10 @@ const StudentsList: React.FC = () => {
               </div>
             ) : (
               uniqueStudents.map((student) => (
-                <IonItem key={student.name} className="ion-padding">
-                  <div className="w-full">
+                <IonItem key={student.name} className="">
+                  <div className="w-full py-4">
                     <div className="flex justify-between items-center">
-                      <IonLabel>
-                        <h1 className="font-bold">{student.name}</h1>                     
-                      </IonLabel>                    
+                      <IonLabel>{student.name}</IonLabel>                    
                       <div className="flex items-center space-x-6">                                   
                         <IonButton 
                           fill="clear"
@@ -155,16 +153,15 @@ const StudentsList: React.FC = () => {
                   </div>
                 </IonItem>
               ))
-            )}
+            )}     
+            <div className="mt-10">            
+              <IonButton onClick={() => history.push("/formulario-aluno")} fill="clear" className="flex justify-center items-center text-black font-semibold py-1 w-full rounded-full w-96 h-10 bg-amber-500">
+                Novo aluno
+              </IonButton>    
+            </div>          
           </IonList>
         </div>
-        <div className="fixed bottom-38 left-0 right-0 px-4 z-10">
-          <div className="max-w-md mx-auto">            
-            <IonButton onClick={() => history.push("/formulario-aluno")} fill="clear" className="flex justify-center items-center text-black font-semibold py-1 w-full rounded-full w-96 h-10 bg-amber-500">
-              Novo aluno
-            </IonButton>    
-          </div>
-        </div>
+  
       </IonContent>
       <FooterTemplate/>
       <IonAlert
