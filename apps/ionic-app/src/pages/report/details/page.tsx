@@ -320,7 +320,7 @@ const StudentDetails: React.FC = () => {
       <HeaderTemplate
         titlePage={studentReport.nome} 
         urlTemplate="/relatorio"
-        showSyncButton={true}
+        showSyncButton={false}
         onSyncClick={handleSync}
         isSyncing={isSyncing}
       />
@@ -393,35 +393,41 @@ const StudentDetails: React.FC = () => {
                 <IonItem key={`hist-detail-${record.id}`}>
                   <div className="w-full flex flex-col justify-start items-start h-full pt-4">
                     <div className="w-full h-full flex justify-between items-start mb-4">
-                      <IonLabel className="flex-grow basis-1/3">
-                        <div className="flex flex-col">
-                          <span className="pb-2 text-sm text-gray-400">Intensidade</span>
+                      <IonLabel className="">
+                        <div className="flex flex-col justify-center items-center">
+                          <span className="pb-2 text-sm text-gray-400">Intensidade: </span>
                           <CustomIntensidade value={record.intensidade} />
                         </div>
                       </IonLabel>
-                      <IonLabel className="flex-grow basis-1/3 text-center">
-                        <span className="text-sm text-gray-400">Performance</span>
-                        <p className="pt-2">
-                          {svgIcons[record.performance as keyof typeof svgIcons]?.icon}
-                        </p>
+                      <IonLabel className="text-center">
+                        <div className="flex flex-col justify-center items-center">
+                          <span className="text-sm text-gray-400">Performance: </span>
+                          <p className="pt-2">
+                            {svgIcons[record.performance as keyof typeof svgIcons]?.icon}
+                          </p>
+                        </div>
                       </IonLabel>
-                      <IonLabel className="flex-grow basis-1/3 text-right">
-                        <div className="flex flex-col items-end">
-                            <span className="pb-2 text-sm text-gray-400">Data</span>
-                            <p className="font-bold">
-                            {formatarData(record.dataCadastro)}
-                            </p>
+                      <IonLabel className="text-right">
+                        <div className="flex flex-col justify-center items-center">
+                          <div className="flex flex-col items-end">
+                              <span className="pb-2 text-sm text-gray-400">Data</span>
+                              <p className="font-bold">
+                              {formatarData(record.dataCadastro)}
+                              </p>
+                          </div>
                         </div>
                       </IonLabel>
                     </div>
                     <div className="flex w-full h-full flex-col mt-2 border-t border-gray-700 pt-4">
                       <IonLabel className="mb-4">
                         <span className="text-sm text-gray-400">Observação: </span>
-                        <p className="mt-1 text-white">{record.observacao || "-"}</p>
+                        <br/>
+                        <span className="mt-1">{record.observacao || "-"}</span>
                       </IonLabel>
                       <IonLabel>
                         <span className="text-sm text-gray-400">Justificativa: </span>
-                        <p className="mt-1 text-white">{record.justificativa || "-"}</p>
+                        <br/>
+                        <span className="mt-1">{record.justificativa || "-"}</span>
                       </IonLabel>
                     </div>
                   </div>

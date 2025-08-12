@@ -97,7 +97,7 @@ const handleFormSubmit = async (e: React.FormEvent) => {
             Novo Relatório de Aluno
           </h2>          
           <form onSubmit={handleFormSubmit} className="h-full w-full">
-            <div className="py-3 w-full">              
+            <div className="py-3  w-full">              
               <StudentAutocomplete
                 selectedStudent={formData.selectedStudent}
                 onStudentChange={setSelectedStudent}

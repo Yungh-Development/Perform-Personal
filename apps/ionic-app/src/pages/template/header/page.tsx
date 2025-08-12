@@ -54,7 +54,7 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
               {isSyncing ? (
                 <IonSpinner name="dots" />
               ) : (
-                <IonIcon slot="icon-only" icon={cloudUploadOutline} />
+                <IonIcon slot="icon-only" className="text-white" icon={cloudUploadOutline} />
               )}
             </IonButton>
           </IonButtons>
