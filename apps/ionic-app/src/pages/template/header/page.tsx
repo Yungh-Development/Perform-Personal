@@ -9,6 +9,8 @@ import {
   IonSpinner 
 } from "@ionic/react";
 import { cloudUploadOutline } from "ionicons/icons"; 
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import { yellow } from "@mui/material/colors";
 
 interface HeaderTemplateProps {
   titlePage: string;
@@ -33,10 +35,11 @@ const HeaderTemplate: React.FC<HeaderTemplateProps> = ({
         <div className="flex ion-padding">
           <IonButton
             color="yellow-personal"
-            shape="round"
+            fill="clear"
+            className="bg-yellow-400 w-10 h-10 rounded-full " 
             onClick={() => router.push(urlTemplate, "back", "pop")} 
-          >
-            <IonIcon slot="icon-only" icon="arrow-back" color="black"></IonIcon>
+          >            
+            <ArrowBackOutlinedIcon sx={{ fontSize: 20, color: "black"}}/> 
           </IonButton>    
           <div className="flex ml-4 justify-center items-center">
             <IonTitle className="text-white text-2xl">{titlePage}</IonTitle>

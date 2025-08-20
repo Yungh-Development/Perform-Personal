@@ -1,6 +1,7 @@
 import { IonButton, IonFooter } from '@ionic/react';
 import FitnessCenterOutlinedIcon from '@mui/icons-material/FitnessCenterOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import { useLocation } from 'react-router-dom';
 
@@ -11,8 +12,8 @@ const FooterTemplate = () => {
     <IonFooter className="relative bg-[#1F1F1F]" >
       <div className="absolute bg-amber-500 rounded-full w-12 h-12 flex items-center justify-center left-1/2 -ml-6 -top-1/2">
         <div className="flex">
-          <a href="/formulario-performance" className="mt-2">
-            <ion-icon name="add" color="black" size="large"></ion-icon>
+          <a href="/formulario-performance">
+            <AddOutlinedIcon sx={{ fontSize: 35, color: "black" }} />
           </a>
         </div>
       </div>
