@@ -319,7 +319,7 @@ const StudentDetails: React.FC = () => {
     <IonPage>
       <HeaderTemplate
         titlePage={studentReport.nome} 
-        urlTemplate="/relatorio"
+        urlTemplate="/lista-alunos"
         showSyncButton={false}
         onSyncClick={handleSync}
         isSyncing={isSyncing}

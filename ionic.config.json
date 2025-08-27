@@ -1,0 +1,7 @@
+{
+  "name": "Perform-Personal",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

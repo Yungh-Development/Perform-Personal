@@ -155,7 +155,7 @@ const StudentsList: React.FC = () => {
               ))
             )}     
             <div className="mt-10 ion-padding">            
-              <IonButton onClick={() => history.push("/formulario-aluno")} fill="clear" className="flex justify-center  items-center text-black font-semibold py-1 w-full rounded-full w-96 h-10 bg-amber-500">
+              <IonButton onClick={() => history.push("/formulario-performance")} fill="clear" className="flex justify-center  items-center text-black font-semibold py-1 w-full rounded-full w-96 h-10 bg-amber-500">
                 Novo aluno
               </IonButton>    
             </div>          

@@ -99,3 +99,50 @@ ion-footer ion-icon:hover {
 .ion-footer-icons {
     font-size: 38px;
 }
+
+ion-button[fill="outline"] {
+  --border-color: var(--ion-yellow-personal);
+  --border-width: 2px; 
+}
+
+ion-range::part(tick) {
+  background: #fff;
+}
+
+ion-range::part(tick-active) {
+  background: #fff;
+}
+
+ion-range::part(pin) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #FE9A00;
+  color: #000;
+
+  border-radius: 50%;
+  transform: scale(1.01);
+
+  top: -20px;
+
+  min-width: 28px;
+  height: 28px;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+ion-range::part(pin)::before {
+  content: none;
+}
+
+ion-range::part(knob) {
+  background: #FE9A00;
+}
+
+ion-range::part(bar) {
+  background: #fff;
+}
+
+ion-range::part(bar-active) {
+  background: #fff;
+}

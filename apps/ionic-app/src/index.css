@@ -5,3 +5,7 @@ html {
      font-weight: 400;
   }
 
+  ion-content {
+    --offset-top: 0px !important;
+    --offset-bottom: 0px !important;
+  }

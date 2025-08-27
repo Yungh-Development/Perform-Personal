@@ -4,8 +4,9 @@ const urlsToCache = [
   '/static/js/bundle.js',
   '/static/css/main.css',
   '/manifest.json',
-  '/assets/icon/icon.jpeg',
-  '/assets/icon/icon-192.jpeg'
+  '/assets/icon/icon.png',
+  '/assets/icon/icon-192.png',
+  '/assets/personal-welcome-image.png',
 ];
 
 self.addEventListener('install', (event) => {

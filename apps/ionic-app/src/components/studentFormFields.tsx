@@ -24,9 +24,10 @@ const StudentFormFields: React.FC<StudentFormFieldsProps> = ({
       <IonItem className="w-full" color="page-container">
         <IonRange
           aria-label="Range with ticks"
-          className="w-full mx-2 my-2"
+          className="w-full mx-4 my-7"
           ticks={true}
           snaps={true}
+          pin={true}
           value={intensidade}
           onIonChange={(e: any) => onIntensidadeChange(e.detail.value!)}
           min={0}

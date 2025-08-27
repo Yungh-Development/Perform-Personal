@@ -1,6 +1,6 @@
 {
-  "short_name": "Perform Personal",
-  "name": "Perform Personal - Gestão de Alunos",
+  "short_name": "GoalGetter ",
+  "name": "GoalGetter  - Gabi Moraes",
   "description": "Aplicativo para gestão de treinos",
   "icons": [
     {
@@ -9,15 +9,21 @@
       "type": "image/x-icon"
     },
     {
-      "src": "assets/icon/icon.jpeg",
-      "type": "image/jpeg",
+      "src": "assets/icon/icon.png",
+      "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
     },
     {
-      "src": "assets/icon/icon-192.jpeg",
-      "type": "image/jpeg",
+      "src": "assets/icon/icon-192.png",
+      "type": "image/png",
       "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/personal-welcome-image.png",
+      "type": "image/png",
+      "sizes": "2000x1333",
       "purpose": "any"
     }
   ],

@@ -87,7 +87,7 @@ const handleFormSubmit = async (e: React.FormEvent) => {
       <HeaderTemplate 
         titlePage="Novo Relatório" 
         urlTemplate="/home" 
-        showSyncButton={true}
+        showSyncButton={false}
         onSyncClick={onSyncClick}
         isSyncing={isSyncing}
       />
@@ -142,16 +142,16 @@ const handleFormSubmit = async (e: React.FormEvent) => {
         </IonHeader>
         <IonContent className="ion-padding">
           <div className="flex flex-col h-full justify-center">
-            <IonItem lines="none" className="text-center">
-              <IonLabel className="text-lg">O que deseja fazer agora?</IonLabel>
+            <IonItem lines="none" className="text-center" >
+              <IonLabel className="text-lg bg-[##0D0D0D]">O que deseja fazer agora?</IonLabel>
             </IonItem>
             
             <div className="mt-8 space-y-4">
               <IonButton
                 expand="block"
                 onClick={handleAddMore}
-                fill="solid"
-                className="font-semibold"
+                fill="clear"
+                className="font-semibold bg-amber-500 text-black rounded"
               >
                 Adicionar Mais
               </IonButton>
@@ -160,7 +160,7 @@ const handleFormSubmit = async (e: React.FormEvent) => {
                 expand="block"
                 onClick={handleSaveAndGoToReport}
                 fill="outline"
-                className="font-semibold"
+                className="font-semibold text-amber-500"
               >
                 Salvar e Ir para Relatórios
               </IonButton>
