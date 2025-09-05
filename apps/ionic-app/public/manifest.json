@@ -1,6 +1,7 @@
 {
-  "short_name": "Ionic App",
-  "name": "My Ionic App",
+  "short_name": "GoalGetter ",
+  "name": "GoalGetter  - Gabi Moraes",
+  "description": "Aplicativo para gestão de treinos",
   "icons": [
     {
       "src": "assets/icon/favicon.png",
@@ -12,10 +13,25 @@
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
+    },
+    {
+      "src": "assets/icon/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/personal-welcome-image.png",
+      "type": "image/png",
+      "sizes": "2000x1333",
+      "purpose": "any"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff"
+  "orientation": "portrait",
+  "theme_color": "#3880ff",
+  "background_color": "#ffffff",
+  "categories": ["fitness", "health", "productivity"],
+  "lang": "pt-BR"
 }

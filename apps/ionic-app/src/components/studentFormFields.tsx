@@ -21,12 +21,13 @@ const StudentFormFields: React.FC<StudentFormFieldsProps> = ({
   return (
     <>
       <IonLabel className="mt-4 w-full">Intensidade do Treino</IonLabel>
-      <IonItem className="mb-4 mt-1 p-0 w-full" color="page-container">
+      <IonItem className="w-full" color="page-container">
         <IonRange
           aria-label="Range with ticks"
-          className="w-full mx-3"
+          className="w-full mx-4 my-7"
           ticks={true}
           snaps={true}
+          pin={true}
           value={intensidade}
           onIonChange={(e: any) => onIntensidadeChange(e.detail.value!)}
           min={0}
@@ -36,6 +37,7 @@ const StudentFormFields: React.FC<StudentFormFieldsProps> = ({
       <IonItem className="mb-4 mt-1" color="page-container">
         <IonInput
           type="text"
+          className="my-2"
           placeholder="Maior facilidade ou dificuldade"
           value={observacao}
           onIonChange={(e) => onObservacaoChange(e.detail.value!)}
@@ -44,6 +46,7 @@ const StudentFormFields: React.FC<StudentFormFieldsProps> = ({
       <IonItem className="mb-4 mt-1" color="page-container">
         <IonInput
           type="text"
+          className="my-2"
           placeholder="Justificativa (opcional)"
           value={justificativa}
           onIonChange={(e) => onJustificativaChange(e.detail.value!)}

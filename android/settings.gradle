@@ -1,0 +1,2 @@
+apply from: 'capacitor.settings.gradle'
+include ':capacitor-android:myapplication'

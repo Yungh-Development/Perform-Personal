@@ -16,6 +16,8 @@ import { svgIcons } from "../../students/constants";
 import { useReportStore, PerformanceReport } from "../../../components/reportStorage";
 import { backupReportsToFirebase, fetchAllReportsFromFirebase } from "../../../utils/firebase";
 import { Timestamp } from "firebase/firestore";
+import "../../../index.css";
+import "../../../theme/variables.css"
 
 interface StudentReport {
   id: string;
@@ -292,11 +294,12 @@ const ReportListZustand_v2: React.FC = () => {
             onIonChange={(e) => setSearchTerm(e.detail.value || "")}
             placeholder="Filtrar por Aluno, Performance..."
             className="px-4 pt-2 pb-2"
+            color="default" 
             debounce={300}
           />
           <IonList>
             {filteredStudents.length === 0 ? (
-              <div className="text-center p-8 text-gray-500">
+              <div className="text-center text-gray-500">
                 {searchTerm
                   ? "Nenhum aluno encontrado para o filtro"
                   : "Nenhum aluno cadastrado ainda"
@@ -308,28 +311,21 @@ const ReportListZustand_v2: React.FC = () => {
                 return (
                   <IonItem 
                     key={student.latestReportId} 
-                    className="ion-padding"
+                    className=""
                     button
                     routerLink={`/student-details/${student.latestReportId}`}
                   >
-                    <div className="w-full flex justify-between items-center">
+                    <div className="w-full flex justify-between items-center ion-padding">
                       <IonLabel className="flex-grow">
                         <h2 className="font-bold">{student.name}</h2>
-                        <p className="text-sm text-gray-500">
-                          {formatDate(student.dataCadastro)}
-                        </p>
                       </IonLabel>
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center">
                         {performanceIcon && (
                           <div className="flex-none w-10 text-center">
                             {performanceIcon.icon}
                           </div>
                         )}
-                        {student.intensidade !== undefined && (
-                          <div className="flex-none w-8 text-center">
-                            <h2 className="font-bold text-lg">{student.intensidade}</h2>
-                          </div>
-                        )}
+                  
                       </div>
                     </div>
                   </IonItem>

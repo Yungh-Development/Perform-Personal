@@ -3,6 +3,20 @@ http://ionicframework.com/docs/theming/ */
 
 
 :root {
+    --ion-color-primary: #428cff;
+    --ion-color-primary-rgb: 66, 140, 255;
+    --ion-color-primary-contrast: #ffffff;
+    --ion-color-primary-contrast-rgb: 255, 255, 255;
+    --ion-color-primary-shade: #3a7be0;
+    --ion-color-primary-tint: #5598ff;
+
+    --ion-background-color: #121212;
+    --ion-background-color-rgb: 18, 18, 18;
+    --ion-text-color: #ffffff;
+    --ion-text-color-rgb: 255, 255, 255;
+    --ion-border-color: #222222;
+    --ion-card-background: #1e1e1e;
+    
 	--ion-color-orange-personal: #FF9500;
 	--ion-color-orange-personal-rgb: 255,149,0;
 	--ion-color-orange-personal-contrast: #000000;
@@ -30,6 +44,8 @@ http://ionicframework.com/docs/theming/ */
     --ion-color-page-background-contrast-rgb: 255, 255, 255;
     --ion-color-page-background-shade: #0e0e12;
     --ion-color-page-background-tint: #28282c;
+
+
 }
 
 .ion-color-orange-personal {
@@ -82,4 +98,51 @@ ion-footer ion-icon:hover {
 
 .ion-footer-icons {
     font-size: 38px;
+}
+
+ion-button[fill="outline"] {
+  --border-color: var(--ion-yellow-personal);
+  --border-width: 2px; 
+}
+
+ion-range::part(tick) {
+  background: #fff;
+}
+
+ion-range::part(tick-active) {
+  background: #fff;
+}
+
+ion-range::part(pin) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #FE9A00;
+  color: #000;
+
+  border-radius: 50%;
+  transform: scale(1.01);
+
+  top: -20px;
+
+  min-width: 28px;
+  height: 28px;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+ion-range::part(pin)::before {
+  content: none;
+}
+
+ion-range::part(knob) {
+  background: #FE9A00;
+}
+
+ion-range::part(bar) {
+  background: #fff;
+}
+
+ion-range::part(bar-active) {
+  background: #fff;
 }

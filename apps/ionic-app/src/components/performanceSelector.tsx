@@ -52,11 +52,11 @@ const PerformanceSelector: React.FC<PerformanceSelectorProps> = ({
   return (
     <>
       <IonLabel>Performance do Aluno</IonLabel>
-      <div className="my-4 flex justify-between">
+      <div className="my-4 mx-4 flex justify-between">
         {performanceOptions.map((option) => (
           <div
             key={option.id}
-            className={`rounded-full p-6 ${option.color} cursor-pointer transition-all duration-200 ${
+            className={`rounded-full p-4 ${option.color} cursor-pointer transition-all duration-200 ${
               selectedIcon === option.id ? 'ring-4 ring-blue-500' : ''
             }`}
             onClick={() => onIconClick(option.id)}

@@ -11,15 +11,33 @@ interface PerformanceChartProps {
 
 const PerformanceChart: React.FC<PerformanceChartProps> = ({ data }) => {
   const parseDate = (dateInput: string | Date | Timestamp): Date => {
-    if (dateInput instanceof Timestamp) {
-      return dateInput.toDate();
-    } else if (typeof dateInput === 'string') {
-      return new Date(dateInput);
+    try {
+      if (dateInput instanceof Timestamp) {
+        return dateInput.toDate();
+      } else if (typeof dateInput === 'string') {
+        const parsedDate = new Date(dateInput);
+        if (isNaN(parsedDate.getTime())) {
+          throw new Error('Invalid date string');
+        }
+        return parsedDate;
+      } else if (dateInput instanceof Date) {
+        return dateInput;
+      }
+      throw new Error('Invalid date format');
+    } catch (error) {
+      console.error('Error parsing date:', error);
+      
+      return new Date();
     }
-    return dateInput;
   };
 
-  console.log(data)
+  const formatDate = (date: Date): string => {
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }).replace('.', ''); 
+  };
 
   if (!data || data.length === 0) {
     return (
@@ -50,11 +68,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({ data }) => {
                 />
               </div>
               <div className="mt-1 text-xs text-white text-center">
-                {date.toLocaleDateString('pt-BR', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric'
-                })}
+                {formatDate(date)}
               </div>
             </div>
           );
